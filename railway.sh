@@ -1,5 +1,7 @@
 #!/bin/bash
 
+TZ=America/Bogota
+
 # Ejecutar migraciones
 python manage.py migrate --noinput
 

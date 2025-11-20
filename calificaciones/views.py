@@ -18,17 +18,27 @@ MONGODB_URI = settings.MONGODB_URI if hasattr(settings, 'MONGODB_URI') else "mon
 
 def normalizar_fecha(fecha):
     """
-    Convierte cualquier fecha a timezone-aware usando la zona horaria de Django
+    Convierte cualquier fecha a timezone-aware usando la zona horaria de Colombia
     """
     if fecha is None:
         return timezone.now()
     
-    # Si ya tiene timezone, devolverla tal cual
-    if timezone.is_aware(fecha):
-        return fecha
+    # Obtener timezone de Colombia
+    colombia_tz = pytz.timezone('America/Bogota')
     
-    # Si no tiene timezone, hacerla timezone-aware
-    return timezone.make_aware(fecha)
+    # Si es un datetime naive (sin timezone)
+    if isinstance(fecha, datetime) and timezone.is_naive(fecha):
+        # Asumimos que es UTC y la convertimos a Colombia
+        fecha_utc = pytz.utc.localize(fecha)
+        return fecha_utc.astimezone(colombia_tz)
+    
+    # Si ya tiene timezone
+    if timezone.is_aware(fecha):
+        # Convertir a hora de Colombia
+        return fecha.astimezone(colombia_tz)
+    
+    # Fallback
+    return timezone.now()
 
 
 # VISTAS BASADAS EN FUNCIONES
@@ -69,24 +79,25 @@ def crear_calificacion(request):
                         # Obtener timezone de Colombia
                         colombia_tz = pytz.timezone('America/Bogota')
 
-                        # Crear fecha en UTC (lo que Django usa internamente)
-                        fecha_utc = timezone.now()
-        
-                        # Convertir a hora de Colombia para display
-                        fecha_colombia = fecha_utc.astimezone(colombia_tz)
+                        # Crear fecha DIRECTAMENTE en hora de Colombia
+                        fecha_colombia = datetime.now(colombia_tz)
+                        
+                        # También guardar en UTC para consultas
+                        fecha_utc = fecha_colombia.astimezone(pytz.utc)
         
                         documento = {
                             'nombre': nombre,
                             'comentario': comentario,
                             'calificacion': calificacion_val,
-                            'fecha_creacion': fecha_utc,  # Guardar en UTC
-                            'fecha_creacion_display': fecha_colombia.strftime('%Y-%m-%d %H:%M:%S')  # Para mostrar
+                            'fecha_creacion': fecha_colombia,  # Guardar con timezone de Colombia
+                            'fecha_creacion_utc': fecha_utc,   # Guardar también en UTC
+                            'timezone': 'America/Bogota'
                         }
         
                         resultado = collection.insert_one(documento)
                         print(f"✅ Guardado en MongoDB Atlas con ID: {resultado.inserted_id}")
-                        print(f"🕐 Hora UTC: {fecha_utc}")
                         print(f"🕐 Hora Colombia: {fecha_colombia}")
+                        print(f"🕐 Hora UTC: {fecha_utc}")
                         
                         client.close()
                         
@@ -128,22 +139,32 @@ def crear_calificacion(request):
         'bd_actual': bd_actual
     })
 
-
 def lista_calificaciones(request):
     """Vista FBV para listar calificaciones de ambas bases de datos"""
     bd_actual = getattr(settings, 'TIPO_BASE_DATOS', 'sqlite')
+    
+    # Timezone de Colombia
+    colombia_tz = pytz.timezone('America/Bogota')
     
     # Obtener calificaciones de SQLite
     calificaciones_sqlite = []
     try:
         calificaciones_sql = CalificacionSQLite.objects.all().order_by('-fecha_creacion')
         for cal in calificaciones_sql:
+            # Convertir SIEMPRE a hora de Colombia
+            fecha_col = cal.fecha_creacion
+            if fecha_col:
+                if timezone.is_aware(fecha_col):
+                    fecha_col = fecha_col.astimezone(colombia_tz)
+                else:
+                    fecha_col = timezone.make_aware(fecha_col, timezone.utc).astimezone(colombia_tz)
+            
             calificaciones_sqlite.append({
                 'id': str(cal.id),
                 'nombre': cal.nombre,
                 'comentario': cal.comentario,
                 'calificacion': cal.calificacion,
-                'fecha_creacion': normalizar_fecha(cal.fecha_creacion),
+                'fecha_creacion': fecha_col,
                 'origen': 'SQLite'
             })
     except Exception as e:
@@ -159,31 +180,43 @@ def lista_calificaciones(request):
         collection = db['calificaciones']
         
         for doc in collection.find().sort('fecha_creacion', -1):
-            fecha = doc.get('fecha_creacion', None)
+            fecha_raw = doc.get('fecha_creacion')
+            
+            # Convertir SIEMPRE a hora de Colombia
+            if fecha_raw:
+                if isinstance(fecha_raw, datetime):
+                    if fecha_raw.tzinfo is None:
+                        # Sin timezone, asumimos UTC
+                        fecha_col = pytz.utc.localize(fecha_raw).astimezone(colombia_tz)
+                    else:
+                        # Con timezone, convertir a Colombia
+                        fecha_col = fecha_raw.astimezone(colombia_tz)
+                else:
+                    fecha_col = datetime.now(colombia_tz)
+            else:
+                fecha_col = datetime.now(colombia_tz)
+            
             calificaciones_mongodb.append({
                 'id': str(doc['_id']),
                 'nombre': doc.get('nombre', ''),
                 'comentario': doc.get('comentario', ''),
                 'calificacion': doc.get('calificacion', 0),
-                'fecha_creacion': normalizar_fecha(fecha),
+                'fecha_creacion': fecha_col,
                 'origen': 'MongoDB Atlas'
             })
         
         client.close()
-        print(f"✅ Obtenidas {len(calificaciones_mongodb)} calificaciones de MongoDB Atlas")
     except Exception as e:
-        print(f"⚠️ No se pudieron obtener calificaciones de MongoDB Atlas: {e}")
+        print(f"⚠️ Error con MongoDB: {e}")
     
-    # Combinar todas las calificaciones
+    # Combinar y ordenar
     todas_calificaciones = calificaciones_sqlite + calificaciones_mongodb
-    
-    # Ordenar por fecha
     todas_calificaciones.sort(
-        key=lambda x: x.get('fecha_creacion', timezone.now()),
+        key=lambda x: x.get('fecha_creacion', datetime.now(colombia_tz)),
         reverse=True
     )
     
-    # Calcular estadísticas
+    # Estadísticas
     total_calificaciones = len(todas_calificaciones)
     if total_calificaciones > 0:
         promedio = sum(c['calificacion'] for c in todas_calificaciones) / total_calificaciones
@@ -191,16 +224,13 @@ def lista_calificaciones(request):
     else:
         promedio = 0
     
-    total_sqlite = len(calificaciones_sqlite)
-    total_mongodb = len(calificaciones_mongodb)
-    
     return render(request, 'calificaciones/lista_calificaciones.html', {
         'calificaciones': todas_calificaciones,
         'total_calificaciones': total_calificaciones,
         'promedio': promedio,
         'bd_actual': bd_actual,
-        'total_sqlite': total_sqlite,
-        'total_mongodb': total_mongodb
+        'total_sqlite': len(calificaciones_sqlite),
+        'total_mongodb': len(calificaciones_mongodb)
     })
 
 
@@ -227,7 +257,7 @@ def detalle_calificacion(request, id):
             'nombre': calificacion.nombre,
             'comentario': calificacion.comentario,
             'calificacion': calificacion.calificacion,
-            'fecha_creacion': calificacion.fecha_creacion,
+            'fecha_creacion': normalizar_fecha(calificacion.fecha_creacion),
             'origen': 'SQLite'
         }
         return render(request, 'calificaciones/detalle_calificacion.html', {
@@ -255,7 +285,7 @@ def detalle_calificacion(request, id):
                 'nombre': documento.get('nombre', ''),
                 'comentario': documento.get('comentario', ''),
                 'calificacion': documento.get('calificacion', 0),
-                'fecha_creacion': documento.get('fecha_creacion', None),
+                'fecha_creacion': normalizar_fecha(documento.get('fecha_creacion', None)),
                 'origen': 'MongoDB Atlas'
             }
             return render(request, 'calificaciones/detalle_calificacion.html', {
