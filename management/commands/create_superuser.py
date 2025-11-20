@@ -9,8 +9,8 @@ class Command(BaseCommand):
             User.objects.create_superuser(
                 username='admin',
                 email='admin@ejemplo.com',
-                password='admin13**'
+                password='Admin123!'
             )
-            self.stdout.write(self.style.SUCCESS('Superusuario creado exitosamente'))
+            self.stdout.write(self.style.SUCCESS('✅ Superusuario creado: admin / Admin123!'))
         else:
-            self.stdout.write(self.style.WARNING('El superusuario ya existe'))
+            self.stdout.write(self.style.WARNING('⚠️ El superusuario ya existe'))
