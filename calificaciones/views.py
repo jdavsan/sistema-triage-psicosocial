@@ -9,6 +9,8 @@ from .models import CalificacionSQLite
 from pymongo import MongoClient
 from datetime import datetime
 from bson import ObjectId
+import pytz
+
 
 # Conexion a MongoDB Atlas
 MONGODB_URI = settings.MONGODB_URI if hasattr(settings, 'MONGODB_URI') else "mongodb+srv://admin_triage:Cyb3rN3t78**@sistema-triage.f1qgnh7.mongodb.net/?retryWrites=true&w=majority&appName=sistema-triage"
@@ -63,6 +65,28 @@ def crear_calificacion(request):
                         
                         db = client['sistema_triage']
                         collection = db['calificaciones']
+
+                        # Obtener timezone de Colombia
+                        colombia_tz = pytz.timezone('America/Bogota')
+
+                        # Crear fecha en UTC (lo que Django usa internamente)
+                        fecha_utc = timezone.now()
+        
+                        # Convertir a hora de Colombia para display
+                        fecha_colombia = fecha_utc.astimezone(colombia_tz)
+        
+                        documento = {
+                            'nombre': nombre,
+                            'comentario': comentario,
+                            'calificacion': calificacion_val,
+                            'fecha_creacion': fecha_utc,  # Guardar en UTC
+                            'fecha_creacion_display': fecha_colombia.strftime('%Y-%m-%d %H:%M:%S')  # Para mostrar
+                        }
+        
+                        resultado = collection.insert_one(documento)
+                        print(f"✅ Guardado en MongoDB Atlas con ID: {resultado.inserted_id}")
+                        print(f"🕐 Hora UTC: {fecha_utc}")
+                        print(f"🕐 Hora Colombia: {fecha_colombia}")
                         
                         documento = {
                             'nombre': nombre,
@@ -71,8 +95,6 @@ def crear_calificacion(request):
                             'fecha_creacion': timezone.now()
                         }
                         
-                        resultado = collection.insert_one(documento)
-                        print(f"✅ Guardado en MongoDB Atlas con ID: {resultado.inserted_id}")
                         
                         client.close()
                         

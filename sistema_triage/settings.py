@@ -96,7 +96,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# ⭐ CONFIGURACIÓN CRÍTICA PARA RAILWAY ⭐
+# CONFIGURACIÓN CRÍTICA PARA RAILWAY
 # Confiar en el proxy de Railway para HTTPS
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
@@ -109,7 +109,7 @@ CSRF_TRUSTED_ORIGINS = [
 # Configuración de seguridad para producción
 if not DEBUG:
     # NO forzar HTTPS redirect porque Railway ya lo maneja
-    SECURE_SSL_REDIRECT = False  # ⭐ CAMBIO IMPORTANTE
+    SECURE_SSL_REDIRECT = False
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
     SECURE_BROWSER_XSS_FILTER = True
