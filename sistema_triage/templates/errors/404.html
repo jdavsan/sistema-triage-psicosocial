@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}Error 404 - Página No Encontrada{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center px-4">
+    <div class="max-w-2xl w-full text-center">
+        <!-- Número 404 grande -->
+        <div class="mb-8">
+            <h1 class="text-9xl font-bold text-indigo-600 animate-pulse">404</h1>
+        </div>
+        
+        <!-- Mensaje principal -->
+        <div class="bg-white rounded-2xl shadow-2xl p-8 mb-8">
+            <div class="mb-6">
+                <svg class="w-24 h-24 mx-auto text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+            </div>
+            
+            <h2 class="text-3xl font-bold text-gray-800 mb-4">
+                ¡Oops! Página no encontrada
+            </h2>
+            
+            <p class="text-gray-600 mb-6 text-lg">
+                Lo sentimos, la página que buscas no existe o ha sido movida.
+            </p>
+            
+            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm text-yellow-700 text-left">
+                            <strong>Posibles razones:</strong><br>
+                            • El recurso que buscas no existe<br>
+                            • La URL puede contener un error<br>
+                            • El contenido fue eliminado o movido
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Botones de acción -->
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="{% url 'solicitudes:inicio' %}" 
+                   class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-8 py-3 rounded-lg shadow-md transition duration-300 flex items-center justify-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                    </svg>
+                    Ir al Inicio
+                </a>
+                
+                <button onclick="window.history.back()" 
+                        class="bg-gray-600 hover:bg-gray-700 text-white font-semibold px-8 py-3 rounded-lg shadow-md transition duration-300 flex items-center justify-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                    </svg>
+                    Volver Atrás
+                </button>
+            </div>
+        </div>
+        
+        <!-- Enlaces útiles -->
+        <div class="bg-white rounded-xl shadow-lg p-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">Enlaces Útiles</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                <a href="{% url 'solicitudes:crear_solicitud' %}" class="text-indigo-600 hover:text-indigo-800 hover:underline">
+                    📝 Nueva Solicitud
+                </a>
+                <a href="{% url 'encuentros:lista_encuentros' %}" class="text-indigo-600 hover:text-indigo-800 hover:underline">
+                    📅 Ver Encuentros
+                </a>
+                <a href="{% url 'calificaciones:lista_calificaciones' %}" class="text-indigo-600 hover:text-indigo-800 hover:underline">
+                    ⭐ Calificaciones
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

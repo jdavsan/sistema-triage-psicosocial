@@ -1,0 +1,323 @@
+{% extends 'base.html' %}
+
+{% block title %}Evaluación de Síntomas - Sistema de Triage{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto">
+    <!-- Header mejorado -->
+    <div class="bg-gradient-to-r from-purple-600 to-indigo-700 rounded-lg shadow-xl p-8 mb-8 text-white">
+        <div class="flex items-center gap-4">
+            <div class="text-5xl">🔍</div>
+            <div>
+                <h1 class="text-4xl font-bold mb-2">Paso 3: Identificación de Síntomas y Elementos Clave</h1>
+                <p class="text-purple-100 text-lg">Esta información ayudará al trabajador social a entender mejor su caso y preparar la intervención.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Información de la solicitud -->
+    <div class="bg-blue-50 border-l-4 border-blue-500 rounded-lg p-6 mb-8">
+        <div class="flex items-start gap-3">
+            <div class="text-3xl">ℹ️</div>
+            <div>
+                <h3 class="font-bold text-blue-900 text-lg mb-2">Solicitud #{{ solicitud.id }}</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                    <div>
+                        <span class="text-blue-700 font-semibold">Solicitante:</span>
+                        <span class="text-blue-900">{{ solicitud.nombre_completo }}</span>
+                    </div>
+                    <div>
+                        <span class="text-blue-700 font-semibold">Urgencia:</span>
+                        <span class="px-2 py-1 rounded-full text-xs font-bold
+                            {% if solicitud.urgencia == 'crisis' %}bg-red-200 text-red-800
+                            {% elif solicitud.urgencia == 'alta' %}bg-orange-200 text-orange-800
+                            {% elif solicitud.urgencia == 'media' %}bg-yellow-200 text-yellow-800
+                            {% else %}bg-green-200 text-green-800
+                            {% endif %}">
+                            {{ solicitud.get_urgencia_display }}
+                        </span>
+                    </div>
+                    <div>
+                        <span class="text-blue-700 font-semibold">Fecha:</span>
+                        <span class="text-blue-900">{{ solicitud.fecha_creacion|date:"d/m/Y H:i" }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <form method="post" class="space-y-8">
+        {% csrf_token %}
+        
+        <!-- Sección: Síntomas -->
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+            <div class="bg-gradient-to-r from-orange-500 to-red-600 px-6 py-4">
+                <h2 class="text-2xl font-bold text-white flex items-center gap-2">
+                    <span>😟</span> Síntomas que está experimentando
+                </h2>
+            </div>
+            
+            <div class="p-6">
+                <p class="text-gray-700 mb-6">Seleccione los síntomas que mejor describan su situación actual:</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Síntomas Emocionales -->
+                    <div class="bg-purple-50 rounded-lg p-6 border-2 border-purple-200">
+                        <h3 class="text-xl font-bold text-purple-900 mb-4 flex items-center gap-2">
+                            <span>💭</span> Emocionales
+                        </h3>
+                        <div class="space-y-3">
+                            <label class="flex items-start gap-3 p-3 rounded-lg hover:bg-purple-100 transition-colors cursor-pointer">
+                                <input type="checkbox" 
+                                       name="sintomas" 
+                                       value="ansiedad"
+                                       class="mt-1 w-5 h-5 text-purple-600 border-gray-300 rounded focus:ring-purple-500">
+                                <div class="flex-1">
+                                    <div class="font-semibold text-gray-800">Ansiedad o nerviosismo</div>
+                                    <div class="text-sm text-gray-600">Preocupación constante, tensión, inquietud</div>
+                                </div>
+                            </label>
+
+                            <label class="flex items-start gap-3 p-3 rounded-lg hover:bg-purple-100 transition-colors cursor-pointer">
+                                <input type="checkbox" 
+                                       name="sintomas" 
+                                       value="tristeza"
+                                       class="mt-1 w-5 h-5 text-purple-600 border-gray-300 rounded focus:ring-purple-500">
+                                <div class="flex-1">
+                                    <div class="font-semibold text-gray-800">Tristeza o desesperanza</div>
+                                    <div class="text-sm text-gray-600">Estado de ánimo bajo, llanto frecuente</div>
+                                </div>
+                            </label>
+
+                            <label class="flex items-start gap-3 p-3 rounded-lg hover:bg-purple-100 transition-colors cursor-pointer">
+                                <input type="checkbox" 
+                                       name="sintomas" 
+                                       value="irritabilidad"
+                                       class="mt-1 w-5 h-5 text-purple-600 border-gray-300 rounded focus:ring-purple-500">
+                                <div class="flex-1">
+                                    <div class="font-semibold text-gray-800">Ira o irritabilidad</div>
+                                    <div class="text-sm text-gray-600">Reacciones exageradas, enojo constante</div>
+                                </div>
+                            </label>
+
+                            <label class="flex items-start gap-3 p-3 rounded-lg hover:bg-purple-100 transition-colors cursor-pointer">
+                                <input type="checkbox" 
+                                       name="sintomas" 
+                                       value="culpa"
+                                       class="mt-1 w-5 h-5 text-purple-600 border-gray-300 rounded focus:ring-purple-500">
+                                <div class="flex-1">
+                                    <div class="font-semibold text-gray-800">Culpa o vergüenza</div>
+                                    <div class="text-sm text-gray-600">Sentimientos de culpabilidad constante</div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Síntomas Físicos -->
+                    <div class="bg-green-50 rounded-lg p-6 border-2 border-green-200">
+                        <h3 class="text-xl font-bold text-green-900 mb-4 flex items-center gap-2">
+                            <span>🏥</span> Físicos
+                        </h3>
+                        <div class="space-y-3">
+                            <label class="flex items-start gap-3 p-3 rounded-lg hover:bg-green-100 transition-colors cursor-pointer">
+                                <input type="checkbox" 
+                                       name="sintomas" 
+                                       value="sueno"
+                                       class="mt-1 w-5 h-5 text-green-600 border-gray-300 rounded focus:ring-green-500">
+                                <div class="flex-1">
+                                    <div class="font-semibold text-gray-800">Problemas de sueño</div>
+                                    <div class="text-sm text-gray-600">Insomnio o sueño excesivo</div>
+                                </div>
+                            </label>
+
+                            <label class="flex items-start gap-3 p-3 rounded-lg hover:bg-green-100 transition-colors cursor-pointer">
+                                <input type="checkbox" 
+                                       name="sintomas" 
+                                       value="apetito"
+                                       class="mt-1 w-5 h-5 text-green-600 border-gray-300 rounded focus:ring-green-500">
+                                <div class="flex-1">
+                                    <div class="font-semibold text-gray-800">Cambios en el apetito</div>
+                                    <div class="text-sm text-gray-600">Pérdida o aumento del apetito</div>
+                                </div>
+                            </label>
+
+                            <label class="flex items-start gap-3 p-3 rounded-lg hover:bg-green-100 transition-colors cursor-pointer">
+                                <input type="checkbox" 
+                                       name="sintomas" 
+                                       value="fatiga"
+                                       class="mt-1 w-5 h-5 text-green-600 border-gray-300 rounded focus:ring-green-500">
+                                <div class="flex-1">
+                                    <div class="font-semibold text-gray-800">Fatiga o agotamiento</div>
+                                    <div class="text-sm text-gray-600">Cansancio constante, falta de energía</div>
+                                </div>
+                            </label>
+
+                            <label class="flex items-start gap-3 p-3 rounded-lg hover:bg-green-100 transition-colors cursor-pointer">
+                                <input type="checkbox" 
+                                       name="sintomas" 
+                                       value="dolores"
+                                       class="mt-1 w-5 h-5 text-green-600 border-gray-300 rounded focus:ring-green-500">
+                                <div class="flex-1">
+                                    <div class="font-semibold text-gray-800">Dolores físicos</div>
+                                    <div class="text-sm text-gray-600">Dolores de cabeza, musculares, tensión</div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección: Causas -->
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+            <div class="bg-gradient-to-r from-blue-500 to-blue-600 px-6 py-4">
+                <h2 class="text-2xl font-bold text-white flex items-center gap-2">
+                    <span>🔎</span> Causas o factores relacionados
+                </h2>
+            </div>
+            
+            <div class="p-6">
+                <label class="block text-sm font-semibold text-gray-700 mb-3">
+                    ¿Qué cree que puede estar causando o contribuyendo a su situación?
+                </label>
+                <p class="text-sm text-gray-600 mb-4">
+                    Por ejemplo: problemas familiares, laborales, económicos, de salud, pérdidas, etc.
+                </p>
+                <textarea name="causas" 
+                          rows="4"
+                          placeholder="Describa las posibles causas o factores que considera relevantes..."
+                          class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"></textarea>
+            </div>
+        </div>
+
+        <!-- Sección: Elementos Clave -->
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+            <div class="bg-gradient-to-r from-purple-500 to-orange-500 px-6 py-4">
+                <h2 class="text-2xl font-bold text-white flex items-center gap-2">
+                    <span>💡</span> Elementos clave de su situación
+                </h2>
+            </div>
+            
+            <div class="p-6">
+                <label class="block text-sm font-semibold text-gray-700 mb-3">
+                    Factores importantes que el trabajador social debe conocer:
+                </label>
+                <p class="text-sm text-gray-600 mb-4">
+                    Por ejemplo: situación familiar, red de apoyo, recursos disponibles, antecedentes importantes...
+                </p>
+                <textarea name="elementos_clave" 
+                          rows="4"
+                          placeholder="Situación familiar, red de apoyo, recursos disponibles, antecedentes importantes..."
+                          class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition-all"></textarea>
+            </div>
+        </div>
+
+        <!-- Sección: Observaciones Adicionales -->
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+            <div class="bg-gradient-to-r from-indigo-500 to-purple-600 px-6 py-4">
+                <h2 class="text-2xl font-bold text-white flex items-center gap-2">
+                    <span>📝</span> Observaciones adicionales
+                </h2>
+            </div>
+            
+            <div class="p-6">
+                <label class="block text-sm font-semibold text-gray-700 mb-3">
+                    ¿Hay algo más que quiera compartir con el trabajador social?
+                </label>
+                <p class="text-sm text-gray-600 mb-4">
+                    Cualquier información adicional que considere relevante para su caso.
+                </p>
+                <textarea name="observaciones" 
+                          rows="4"
+                          placeholder="Cualquier información adicional que considere relevante..."
+                          class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all"></textarea>
+            </div>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="flex gap-4">
+            <button type="submit" 
+                    class="flex-1 bg-gradient-to-r from-green-600 to-green-700 text-white px-8 py-4 rounded-lg hover:from-green-700 hover:to-green-800 transition-all shadow-lg hover:shadow-xl text-lg font-bold flex items-center justify-center gap-2">
+                <span>✅</span>
+                Finalizar Evaluación
+            </button>
+            <a href="{% url 'solicitudes:inicio' %}" 
+               class="flex-1 text-center bg-gray-300 text-gray-700 px-8 py-4 rounded-lg hover:bg-gray-400 transition-colors text-lg font-bold flex items-center justify-center gap-2">
+                <span>←</span>
+                Volver Atrás
+            </a>
+        </div>
+    </form>
+</div>
+
+<style>
+    /* Animación suave para los checkboxes */
+    input[type="checkbox"]:checked {
+        transform: scale(1.1);
+    }
+    
+    /* Efecto hover en las opciones */
+    label:has(input[type="checkbox"]) {
+        transition: all 0.3s ease;
+    }
+    
+    label:has(input[type="checkbox"]:checked) {
+        transform: translateX(5px);
+    }
+    
+    /* Animación de entrada */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .bg-white {
+        animation: fadeInUp 0.5s ease-out;
+    }
+</style>
+
+<script>
+    // Contador de síntomas seleccionados
+    document.addEventListener('DOMContentLoaded', function() {
+        const checkboxes = document.querySelectorAll('input[type="checkbox"][name="sintomas"]');
+        const form = document.querySelector('form');
+        
+        // Agregar contador visual
+        const headerSintomas = document.querySelector('.bg-gradient-to-r.from-orange-500');
+        const contadorDiv = document.createElement('div');
+        contadorDiv.className = 'mt-2 text-orange-100 text-sm';
+        contadorDiv.id = 'contador-sintomas';
+        headerSintomas.querySelector('h2').appendChild(contadorDiv);
+        
+        function actualizarContador() {
+            const seleccionados = document.querySelectorAll('input[type="checkbox"][name="sintomas"]:checked').length;
+            const contadorTexto = document.getElementById('contador-sintomas');
+            if (contadorTexto) {
+                contadorTexto.textContent = seleccionados > 0 ? ` (${seleccionados} seleccionados)` : '';
+            }
+        }
+        
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', actualizarContador);
+        });
+        
+        // Validación al enviar
+        form.addEventListener('submit', function(e) {
+            const causas = document.querySelector('textarea[name="causas"]').value.trim();
+            const elementos = document.querySelector('textarea[name="elementos_clave"]').value.trim();
+            
+            if (!causas && !elementos) {
+                e.preventDefault();
+                alert('⚠️ Por favor, complete al menos la sección de causas o elementos clave para ayudarnos a entender mejor su situación.');
+                return false;
+            }
+        });
+    });
+</script>
+{% endblock %}

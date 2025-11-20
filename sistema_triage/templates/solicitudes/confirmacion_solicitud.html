@@ -1,0 +1,195 @@
+{% extends 'base.html' %}
+
+{% block title %}Solicitud Recibida - Sistema de Triage{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <!-- Animación de éxito -->
+    <div class="text-center mb-8 animate-fade-in">
+        <div class="inline-block bg-gradient-to-br from-green-400 to-green-600 rounded-full p-8 shadow-2xl mb-6 animate-bounce-slow">
+            <svg class="w-24 h-24 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+        </div>
+        <h1 class="text-5xl font-bold text-gray-800 mb-4">¡Solicitud Recibida Exitosamente!</h1>
+        <p class="text-xl text-gray-600">Su solicitud ha sido procesada y está siendo evaluada por nuestro equipo</p>
+    </div>
+
+    <!-- Card principal con información -->
+    <div class="bg-white rounded-2xl shadow-2xl overflow-hidden mb-8">
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-blue-600 to-indigo-700 p-8 text-white">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-3xl font-bold mb-2">Solicitud #{{ solicitud.id }}</h2>
+                    <p class="text-blue-100">{{ solicitud.nombre_completo }}</p>
+                </div>
+                <div class="text-right">
+                    <div class="text-sm text-blue-100 mb-1">Fecha de registro</div>
+                    <div class="text-xl font-bold">{{ solicitud.fecha_creacion|date:"d/m/Y H:i" }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Información de la solicitud -->
+        <div class="p-8 space-y-6">
+            <!-- Nivel de urgencia -->
+            <div class="flex items-center gap-4 p-6 rounded-xl
+                {% if solicitud.urgencia == 'crisis' %}bg-red-50 border-2 border-red-200
+                {% elif solicitud.urgencia == 'alta' %}bg-orange-50 border-2 border-orange-200
+                {% elif solicitud.urgencia == 'media' %}bg-yellow-50 border-2 border-yellow-200
+                {% else %}bg-green-50 border-2 border-green-200
+                {% endif %}">
+                <div class="text-5xl">
+                    {% if solicitud.urgencia == 'crisis' %}🚨
+                    {% elif solicitud.urgencia == 'alta' %}⚠️
+                    {% elif solicitud.urgencia == 'media' %}📋
+                    {% else %}✅
+                    {% endif %}
+                </div>
+                <div class="flex-1">
+                    <div class="text-sm font-semibold text-gray-600 mb-1">Nivel de Urgencia</div>
+                    <div class="text-2xl font-bold
+                        {% if solicitud.urgencia == 'crisis' %}text-red-700
+                        {% elif solicitud.urgencia == 'alta' %}text-orange-700
+                        {% elif solicitud.urgencia == 'media' %}text-yellow-700
+                        {% else %}text-green-700
+                        {% endif %}">
+                        {{ solicitud.get_urgencia_display }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Información de contacto -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-gray-50 rounded-lg p-6">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="text-2xl">📧</div>
+                        <div class="font-bold text-gray-800">Correo Electrónico</div>
+                    </div>
+                    <div class="text-gray-600">{{ solicitud.correo_electronico }}</div>
+                </div>
+
+                <div class="bg-gray-50 rounded-lg p-6">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="text-2xl">📱</div>
+                        <div class="font-bold text-gray-800">Celular</div>
+                    </div>
+                    <div class="text-gray-600">{{ solicitud.celular }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Próximos pasos -->
+    <div class="bg-gradient-to-r from-purple-600 to-indigo-700 rounded-2xl shadow-2xl p-8 text-white mb-8">
+        <h2 class="text-3xl font-bold mb-6 flex items-center gap-3">
+            <span>👥</span> Proceso de Atención
+        </h2>
+        
+        <div class="space-y-4">
+            <div class="flex items-start gap-4 bg-white bg-opacity-10 rounded-lg p-4">
+                <div class="bg-white text-purple-600 rounded-full w-10 h-10 flex items-center justify-center font-bold text-lg flex-shrink-0">1</div>
+                <div>
+                    <div class="font-bold text-lg mb-1">Revisión de su caso</div>
+                    <div class="text-purple-100">Un trabajador social revisará su solicitud en las próximas horas</div>
+                </div>
+            </div>
+
+            <div class="flex items-start gap-4 bg-white bg-opacity-10 rounded-lg p-4">
+                <div class="bg-white text-purple-600 rounded-full w-10 h-10 flex items-center justify-center font-bold text-lg flex-shrink-0">2</div>
+                <div>
+                    <div class="font-bold text-lg mb-1">Contacto inicial</div>
+                    <div class="text-purple-100">Será contactado para programar el primer encuentro virtual</div>
+                </div>
+            </div>
+
+            <div class="flex items-start gap-4 bg-white bg-opacity-10 rounded-lg p-4">
+                <div class="bg-white text-purple-600 rounded-full w-10 h-10 flex items-center justify-center font-bold text-lg flex-shrink-0">3</div>
+                <div>
+                    <div class="font-bold text-lg mb-1">Evaluación de necesidades</div>
+                    <div class="text-purple-100">En el primer encuentro se evaluarán sus necesidades específicas</div>
+                </div>
+            </div>
+
+            <div class="flex items-start gap-4 bg-white bg-opacity-10 rounded-lg p-4">
+                <div class="bg-white text-purple-600 rounded-full w-10 h-10 flex items-center justify-center font-bold text-lg flex-shrink-0">4</div>
+                <div>
+                    <div class="font-bold text-lg mb-1">Plan de acompañamiento</div>
+                    <div class="text-purple-100">Se definirán hasta 6 sesiones de acompañamiento personalizado</div>
+                </div>
+            </div>
+
+            <div class="flex items-start gap-4 bg-white bg-opacity-10 rounded-lg p-4">
+                <div class="bg-white text-purple-600 rounded-full w-10 h-10 flex items-center justify-center font-bold text-lg flex-shrink-0">5</div>
+                <div>
+                    <div class="font-bold text-lg mb-1">Seguimiento y apoyo</div>
+                    <div class="text-purple-100">Si es necesario, será remitido a otras entidades especializadas</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Información importante -->
+    <div class="bg-yellow-50 border-l-4 border-yellow-500 rounded-lg p-6 mb-8">
+        <div class="flex items-start gap-4">
+            <div class="text-3xl">💡</div>
+            <div>
+                <h3 class="font-bold text-yellow-900 text-lg mb-2">Información Importante</h3>
+                <ul class="text-yellow-800 space-y-2 text-sm">
+                    <li class="flex items-start gap-2">
+                        <span>•</span>
+                        <span>Recibirá una notificación por correo electrónico y/o mensaje de texto</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <span>•</span>
+                        <span>Mantenga su celular disponible para recibir la llamada del trabajador social</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <span>•</span>
+                        <span>Puede ver el estado de su solicitud en cualquier momento desde esta página</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <span>•</span>
+                        <span>Si marcó su caso como "Crisis", será contactado con máxima prioridad</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Botones de acción -->
+    <div class="flex gap-4">
+        <a href="{% url 'solicitudes:detalle_solicitud' solicitud.id %}" 
+           class="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 text-white px-8 py-4 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg hover:shadow-xl text-center font-bold flex items-center justify-center gap-2">
+            <span>👁️</span>
+            Ver Detalles de mi Solicitud
+        </a>
+        <a href="{% url 'solicitudes:inicio' %}" 
+           class="flex-1 bg-gray-200 text-gray-700 px-8 py-4 rounded-lg hover:bg-gray-300 transition-colors text-center font-bold flex items-center justify-center gap-2">
+            <span>🏠</span>
+            Volver al Inicio
+        </a>
+    </div>
+</div>
+
+<style>
+    @keyframes fade-in {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes bounce-slow {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+    
+    .animate-fade-in {
+        animation: fade-in 0.6s ease-out;
+    }
+    
+    .animate-bounce-slow {
+        animation: bounce-slow 2s infinite;
+    }
+</style>
+{% endblock %}

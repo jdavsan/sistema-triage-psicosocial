@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Sistema de Triage{% endblock %}</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2c3e50',
+                        secondary: '#3498db',
+                        success: '#27ae60',
+                        danger: '#e74c3c',
+                        warning: '#f39c12',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in { animation: fadeIn 0.5s ease-in; }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+    <!-- Navbar -->
+    <nav class="bg-gradient-to-r from-blue-600 to-indigo-700 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <h1 class="text-white text-xl font-bold">
+                        <i class="fas fa-hospital"></i> Sistema de Triage
+                    </h1>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="{% url 'solicitudes:inicio' %}" 
+                        class="text-white hover:bg-blue-700 px-3 py-2 rounded-md text-sm font-medium transition-all">
+                            <i class="fas fa-home"></i> Inicio
+                        </a>
+                        <a href="{% url 'solicitudes:crear_solicitud' %}" 
+                        class="text-white hover:bg-blue-700 px-3 py-2 rounded-md text-sm font-medium transition-all">
+                            <i class="fas fa-file-medical"></i> Nueva Solicitud
+                        </a>
+                        <a href="{% url 'encuentros:lista_encuentros' %}" 
+                        class="text-white hover:bg-blue-700 px-3 py-2 rounded-md text-sm font-medium transition-all">
+                            <i class="fas fa-users"></i> Encuentros
+                        </a>
+                        <a href="{% url 'calificaciones:crear_calificacion' %}"
+                            class="text-white hover:bg-blue-700 px-3 py-2 rounded-md text-sm font-medium transition-all">
+                            <i class="fas fa-star"></i> Calificar
+                        </a>
+                        <a href="{% url 'calificaciones:lista_calificaciones' %}" 
+                            class="text-white hover:bg-blue-700 px-3 py-2 rounded-md text-sm font-medium transition-all">
+                            <i class="fas fa-list"></i> Calificaciones
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        {% if messages %}
+            <div class="mb-4">
+                {% for message in messages %}
+                    <div class="fade-in {% if message.tags == 'success' %}bg-green-100 border-l-4 border-green-500 text-green-700{% elif message.tags == 'error' %}bg-red-100 border-l-4 border-red-500 text-red-700{% else %}bg-blue-100 border-l-4 border-blue-500 text-blue-700{% endif %} p-4 rounded shadow-md" role="alert">
+                        <p class="font-bold">{{ message.tags|title }}</p>
+                        <p>{{ message }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        
+        <div class="fade-in">
+            {% block content %}
+            {% endblock %}
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white mt-12">
+        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+            <p class="text-center text-sm">
+                © 2025 Sistema de Triage - UNINPAHU |  Django
+            </p>
+        </div>
+    </footer>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

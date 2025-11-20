@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+
+{% block title %}Lista de Calificaciones (CBV) - Sistema de Triage{% endblock %}
+
+{% block content %}
+<div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+    <h1 class="text-4xl font-bold text-gray-800 mb-2">
+        ⭐ Calificaciones del Servicio
+    </h1>
+    <p class="text-gray-600">Vista genérica usando Class-Based Views (CBV)</p>
+</div>
+
+<!-- Estadísticas -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+    <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg p-6 text-white">
+        <div class="text-3xl font-bold">{{ total_calificaciones }}</div>
+        <div class="text-sm opacity-90">Total Calificaciones</div>
+    </div>
+    <div class="bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-lg p-6 text-white">
+        <div class="text-3xl font-bold">{{ promedio }}</div>
+        <div class="text-sm opacity-90">Promedio ⭐</div>
+    </div>
+    <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-lg p-6 text-white">
+        <div class="text-3xl font-bold">{{ estadisticas.excelentes }}</div>
+        <div class="text-sm opacity-90">Excelentes (5⭐)</div>
+    </div>
+    <div class="bg-gradient-to-br from-red-500 to-red-600 rounded-lg p-6 text-white">
+        <div class="text-3xl font-bold">{{ estadisticas.malas }}</div>
+        <div class="text-sm opacity-90">Por mejorar (≤2⭐)</div>
+    </div>
+</div>
+
+<!-- Botón crear -->
+<div class="mb-6">
+    <a href="{% url 'calificaciones:crear_calificacion_cbv' %}" 
+       class="inline-block bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors">
+        ➕ Nueva Calificación (CBV)
+    </a>
+    <a href="{% url 'calificaciones:lista_calificaciones' %}" 
+       class="inline-block bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors">
+        ← Ver lista FBV
+    </a>
+</div>
+
+<!-- Lista de calificaciones -->
+<div class="bg-white rounded-lg shadow-lg overflow-hidden">
+    {% if calificaciones %}
+        <div class="divide-y divide-gray-200">
+            {% for calificacion in calificaciones %}
+                <div class="p-6 hover:bg-gray-50 transition-colors">
+                    <div class="flex justify-between items-start mb-3">
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-800">{{ calificacion.nombre }}</h3>
+                            <p class="text-sm text-gray-500">{{ calificacion.fecha_creacion|date:"d/m/Y H:i" }}</p>
+                        </div>
+                        <div class="text-2xl">
+                            {% for i in "12345" %}
+                                {% if forloop.counter <= calificacion.calificacion %}
+                                    ⭐
+                                {% else %}
+                                    ☆
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <p class="text-gray-700 mb-4">{{ calificacion.comentario|truncatewords:20 }}</p>
+                    <div class="flex gap-2">
+                        <a href="{% url 'calificaciones:detalle_calificacion_cbv' calificacion.pk %}" 
+                           class="text-blue-600 hover:text-blue-800">
+                            👁️ Ver detalle
+                        </a>
+                        <a href="{% url 'calificaciones:editar_calificacion_cbv' calificacion.pk %}" 
+                           class="text-green-600 hover:text-green-800">
+                            ✏️ Editar
+                        </a>
+                        <a href="{% url 'calificaciones:eliminar_calificacion_cbv' calificacion.pk %}" 
+                           class="text-red-600 hover:text-red-800">
+                            🗑️ Eliminar
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        
+        <!-- Paginación -->
+        {% if is_paginated %}
+            <div class="bg-gray-50 px-6 py-4 flex justify-between items-center">
+                <div class="text-sm text-gray-700">
+                    Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                </div>
+                <div class="flex gap-2">
+                    {% if page_obj.has_previous %}
+                        <a href="?page=1" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Primera</a>
+                        <a href="?page={{ page_obj.previous_page_number }}" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Anterior</a>
+                    {% endif %}
+                    
+                    {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Siguiente</a>
+                        <a href="?page={{ page_obj.paginator.num_pages }}" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Última</a>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+    {% else %}
+        <div class="p-12 text-center">
+            <div class="text-6xl mb-4">📭</div>
+            <p class="text-xl text-gray-600">No hay calificaciones todavía</p>
+            <a href="{% url 'calificaciones:crear_calificacion_cbv' %}" 
+               class="inline-block mt-4 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700">
+                Crear primera calificación
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

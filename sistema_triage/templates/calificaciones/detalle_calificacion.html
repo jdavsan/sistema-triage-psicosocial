@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block title %}Detalle Calificación - Sistema de Triage{% endblock %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 0 auto;">
+    <h2>⭐ Detalle de Calificación</h2>
+
+    <div style="border: 2px solid #3498db; padding: 2rem; border-radius: 8px; margin: 2rem 0;">
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <h3 style="margin: 0 0 0.5rem 0;">{{ calificacion.nombre }}</h3>
+            <p style="color: #666; margin: 0;">{{ calificacion.fecha_creacion|date:"d/m/Y H:i" }}</p>
+        </div>
+
+        <!-- Calificación con estrellas -->
+        <div style="text-align: center; margin: 2rem 0;">
+            <div style="font-size: 2rem; margin-bottom: 1rem;">
+                {% with ''|center:calificacion.calificacion as range %}
+                {% for i in range %}
+                    ⭐
+                {% endfor %}
+                {% endwith %}
+            </div>
+            <h2 style="margin: 0; color: #e67e22;">{{ calificacion.calificacion }}/5</h2>
+        </div>
+
+        <!-- Comentario -->
+        {% if calificacion.comentario %}
+        <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 8px; margin: 2rem 0;">
+            <h4 style="margin-top: 0;">📝 Comentario:</h4>
+            <p style="margin: 0; font-size: 1.1rem; line-height: 1.6;">{{ calificacion.comentario }}</p>
+        </div>
+        {% else %}
+        <div style="text-align: center; color: #666; margin: 2rem 0;">
+            <p>No se agregó comentario para esta calificación.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Botones de navegación -->
+    <div style="text-align: center;">
+        <a href="{% url 'calificaciones:lista_calificaciones' %}" class="btn">
+            📋 Volver a la Lista
+        </a>
+        <a href="{% url 'calificaciones:crear_calificacion' %}" class="btn btn-success">
+            ➕ Nueva Calificación
+        </a>
+        <a href="{% url 'solicitudes:inicio' %}" class="btn" style="background: #95a5a6;">
+            🏠 Volver al Inicio
+        </a>
+    </div>
+</div>
+{% endblock %}

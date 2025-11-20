@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+
+{% block title %}Calificaciones del Servicio - Sistema de Triage{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+    <!-- Header mejorado -->
+    <div class="bg-gradient-to-r from-blue-500 to-green-600 rounded-lg shadow-xl p-8 mb-8 text-white">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <div class="text-5xl">⭐</div>
+                <div>
+                    <h1 class="text-4xl font-bold mb-2">Calificaciones del Servicio</h1>
+                    <p class="text-yellow-100 text-lg">Opiniones y experiencias de nuestros usuarios</p>
+                </div>
+            </div>
+            <a href="{% url 'calificaciones:crear_calificacion' %}" 
+               class="bg-white text-blue-600 px-6 py-3 rounded-lg hover:bg-blue-50 transition-colors font-bold shadow-lg">
+                ➕ Nueva Calificación
+            </a>
+            <a href="{% url 'calificaciones:estadisticas' %}" 
+                    class="bg-purple-600 hover:bg-purple-700 text-white font-semibold px-6 py-3 rounded-lg">
+                        Estadísticas
+            </a>
+        </div>
+    </div>
+
+    <!-- Estadísticas mejoradas -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <!-- Total -->
+        <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg p-6 text-white shadow-lg transform hover:scale-105 transition-transform">
+            <div class="flex items-center justify-between mb-2">
+                <div class="text-3xl">📊</div>
+                <div class="text-right">
+                    <div class="text-4xl font-bold">{{ total_calificaciones }}</div>
+                    <div class="text-sm opacity-90">Total Calificaciones</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Promedio -->
+        <div class="bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-lg p-6 text-white shadow-lg transform hover:scale-105 transition-transform">
+            <div class="flex items-center justify-between mb-2">
+                <div class="text-3xl">⭐</div>
+                <div class="text-right">
+                    <div class="text-4xl font-bold">{{ promedio }}</div>
+                    <div class="text-sm opacity-90">Calificación Promedio</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SQLite -->
+        <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg p-6 text-white shadow-lg transform hover:scale-105 transition-transform">
+            <div class="flex items-center justify-between mb-2">
+                <div class="text-3xl">🗄️</div>
+                <div class="text-right">
+                    <div class="text-4xl font-bold">{{ total_sqlite }}</div>
+                    <div class="text-sm opacity-90">En SQLite</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MongoDB -->
+        <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-lg p-6 text-white shadow-lg transform hover:scale-105 transition-transform">
+            <div class="flex items-center justify-between mb-2">
+                <div class="text-3xl">🍃</div>
+                <div class="text-right">
+                    <div class="text-4xl font-bold">{{ total_mongodb }}</div>
+                    <div class="text-sm opacity-90">En MongoDB</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de calificaciones mejorada -->
+    <div class="bg-white rounded-lg shadow-xl overflow-hidden">
+        <div class="bg-gradient-to-r from-gray-700 to-gray-800 px-6 py-4">
+            <h2 class="text-2xl font-bold text-white flex items-center gap-2">
+                <span>📋</span> Todas las Calificaciones
+            </h2>
+        </div>
+
+        {% if calificaciones %}
+            <div class="divide-y divide-gray-200">
+                {% for calificacion in calificaciones %}
+                    <div class="p-6 hover:bg-gray-50 transition-colors">
+                        <div class="flex justify-between items-start mb-4">
+                            <!-- Información del usuario -->
+                            <div class="flex-1">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white text-xl font-bold">
+                                        {{ calificacion.nombre|slice:":1"|upper }}
+                                    </div>
+                                    <div>
+                                        <h3 class="text-xl font-bold text-gray-800">{{ calificacion.nombre }}</h3>
+                                        <div class="flex items-center gap-2 text-sm text-gray-500">
+                                            <span>🕒 {{ calificacion.fecha_creacion|date:"d/m/Y H:i" }}</span>
+                                            <span class="px-2 py-1 rounded-full text-xs font-semibold
+                                                {% if calificacion.origen == 'SQLite' %}
+                                                    bg-purple-100 text-purple-700
+                                                {% else %}
+                                                    bg-green-100 text-green-700
+                                                {% endif %}">
+                                                {{ calificacion.origen }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Calificación con estrellas -->
+                            <div class="text-right">
+                                <div class="text-3xl mb-1">
+                                    {% for i in "12345" %}
+                                        {% if forloop.counter <= calificacion.calificacion %}
+                                            ⭐
+                                        {% else %}
+                                            ☆
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                                <div class="text-sm font-bold text-gray-600">({{ calificacion.calificacion }}/5)</div>
+                            </div>
+                        </div>
+
+                        <!-- Comentario -->
+                        <div class="bg-gray-50 rounded-lg p-4 mb-4">
+                            <p class="text-gray-700 italic">"{{ calificacion.comentario }}"</p>
+                        </div>
+
+                        <!-- Botón ver detalle -->
+                        <div class="flex justify-end">
+                            <a href="{% url 'calificaciones:detalle_calificacion' calificacion.id %}" 
+                               class="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 font-semibold transition-colors">
+                                👁️ Ver Detalle
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="p-12 text-center">
+                <div class="text-6xl mb-4">📭</div>
+                <h3 class="text-2xl font-bold text-gray-800 mb-2">No hay calificaciones todavía</h3>
+                <p class="text-gray-600 mb-6">Sé el primero en calificar nuestro servicio</p>
+                <a href="{% url 'calificaciones:crear_calificacion' %}" 
+                   class="inline-block bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-8 py-4 rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg font-bold">
+                    ⭐ Crear Primera Calificación
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+.alert-success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.alert-info {
+    background: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}
+
+.alert-error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+</style>
+
+{% endblock %}
+

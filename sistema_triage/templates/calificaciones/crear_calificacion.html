@@ -1,0 +1,282 @@
+{% extends 'base.html' %}
+
+{% block title %}Calificar Servicio - Sistema de Triage{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <!-- Header mejorado -->
+    <div class="bg-gradient-to-r from-blue-500 to-green-600 rounded-lg shadow-xl p-8 mb-8 text-white">
+        <div class="flex items-center gap-4">
+            <div class="text-5xl">⭐</div>
+            <div>
+                <h1 class="text-4xl font-bold mb-2">Calificar Nuestro Servicio</h1>
+                <p class="text-yellow-100 text-lg">Tu opinión es muy importante para nosotros. Por favor califica tu experiencia.</p>
+            </div>
+        </div>
+    </div>
+
+    <form method="post" class="space-y-6">
+        {% csrf_token %}
+        
+        <!-- Selector de Base de Datos -->
+        <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg shadow-lg overflow-hidden border-2 border-blue-200">
+            <div class="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-4">
+                <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                    <span>💾</span> Base de datos actual: 
+                    <span class="bg-white text-blue-600 px-3 py-1 rounded-full text-sm font-bold">
+                        {{ bd_actual|upper }}
+                    </span>
+                </h2>
+            </div>
+            
+            <div class="p-6">
+                <label class="block text-sm font-semibold text-gray-700 mb-3">
+                    🎯 Guardar en:
+                </label>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Opción SQLite -->
+                    <label class="relative flex items-center p-4 border-2 border-gray-200 rounded-lg cursor-pointer transition-all hover:border-blue-400 hover:shadow-md">
+                        <input type="radio" 
+                               name="tipo_base_datos" 
+                               value="sqlite" 
+                               {% if bd_actual == 'sqlite' %}checked{% endif %}
+                               class="mr-3 accent-blue-600">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="text-2xl">🗄️</span>
+                                <span class="font-bold text-gray-800">SQLite</span>
+                            </div>
+                            <p class="text-sm text-gray-600">Base de datos relacional - Ideal para desarrollo y pruebas</p>
+                        </div>
+                    </label>
+
+                    <!-- Opción MongoDB -->
+                    <label class="relative flex items-center p-4 border-2 border-gray-200 rounded-lg cursor-pointer transition-all hover:border-green-400 hover:shadow-md">
+                        <input type="radio" 
+                               name="tipo_base_datos" 
+                               value="mongodb" 
+                               {% if bd_actual == 'mongodb' %}checked{% endif %}
+                               class="mr-3 accent-green-600">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="text-2xl">🍃</span>
+                                <span class="font-bold text-gray-800">MongoDB</span>
+                            </div>
+                            <p class="text-sm text-gray-600">Base de datos no relacional - Escalable para producción</p>
+                        </div>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Información Personal -->
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+            <div class="bg-gradient-to-r from-blue-500 to-blue-600 px-6 py-4">
+                <h2 class="text-2xl font-bold text-white flex items-center gap-2">
+                    <span>👤</span> Información Personal
+                </h2>
+            </div>
+            
+            <div class="p-6">
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                    Tu nombre <span class="text-red-500">*</span>
+                </label>
+                {{ form.nombre }}
+                {% if form.nombre.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.nombre.errors.0 }}</p>
+                {% endif %}
+                
+                {% if form.confirmar_nombre %}
+                <div class="mt-4">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        Confirmar nombre <span class="text-red-500">*</span>
+                    </label>
+                    {{ form.confirmar_nombre }}
+                    {% if form.confirmar_nombre.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.confirmar_nombre.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Calificación del Servicio -->
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+            <div class="bg-gradient-to-r from-blue-500 to-green-600 shadow-xl p-8 mb-8 text-white">
+                <h2 class="text-2xl font-bold text-white flex items-center gap-2">
+                    <span>🎯</span> Calificación del Servicio
+                </h2>
+            </div>
+            
+            <div class="p-6 space-y-4">
+                <!-- Calificación con estrellas visuales -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        Calificación (1-5) <span class="text-red-500">*</span>
+                    </label>
+                    
+                    <div class="flex items-center gap-4 mb-2">
+                        <div class="flex gap-1 text-3xl" id="star-rating">
+                            <span class="star cursor-pointer transition-all hover:scale-110" data-value="1">☆</span>
+                            <span class="star cursor-pointer transition-all hover:scale-110" data-value="2">☆</span>
+                            <span class="star cursor-pointer transition-all hover:scale-110" data-value="3">☆</span>
+                            <span class="star cursor-pointer transition-all hover:scale-110" data-value="4">☆</span>
+                            <span class="star cursor-pointer transition-all hover:scale-110" data-value="5">☆</span>
+                        </div>
+                        <span id="rating-text" class="text-gray-600 font-medium"></span>
+                    </div>
+                    
+                    {{ form.calificacion }}
+                    
+                    <p class="text-sm text-gray-500 mt-2">
+                        1 = Muy malo, 10 = Excelente
+                    </p>
+                    
+                    {% if form.calificacion.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.calificacion.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Comentario -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        Comentario (opcional)
+                    </label>
+                    <p class="text-sm text-gray-600 mb-2">
+                        Cuéntanos sobre tu experiencia con nuestro servicio
+                    </p>
+                    {{ form.comentario }}
+                    {% if form.comentario.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.comentario.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="flex gap-4">
+            <button type="submit" 
+                    class="flex-1 bg-gradient-to-r from-green-600 to-green-700 text-white px-8 py-4 rounded-lg hover:from-green-700 hover:to-green-800 transition-all shadow-lg hover:shadow-xl text-lg font-bold">
+                ⭐ Enviar Calificación
+            </button>
+            <a href="{% url 'calificaciones:lista_calificaciones' %}" 
+               class="flex-1 text-center bg-gray-300 text-gray-700 px-8 py-4 rounded-lg hover:bg-gray-400 transition-colors text-lg font-bold">
+                ← Volver
+            </a>
+        </div>
+    </form>
+</div>
+
+<style>
+    /* Estilos para los inputs del formulario */
+    form input[type="text"],
+    form input[type="number"],
+    form textarea {
+        width: 100%;
+        padding: 0.75rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 0.5rem;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    form input:focus,
+    form textarea:focus {
+        outline: none;
+        border-color: #f59e0b;
+        box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+    }
+    
+    form textarea {
+        min-height: 120px;
+        resize: vertical;
+    }
+    
+    form input::placeholder,
+    form textarea::placeholder {
+        color: #9ca3af;
+    }
+    
+    /* Ocultar el input de calificación original */
+    form input[type="number"][name="calificacion"] {
+        display: none;
+    }
+    
+    /* Estilo para radio buttons de base de datos */
+    input[type="radio"]:checked + div {
+        background-color: #eff6ff;
+    }
+    
+    label:has(input[type="radio"]:checked) {
+        border-color: #3b82f6 !important;
+        background-color: #eff6ff;
+    }
+    
+    .star.active {
+        color: #fbbf24;
+    }
+</style>
+
+<script>
+    // Sistema de calificación por estrellas
+    document.addEventListener('DOMContentLoaded', function() {
+        const stars = document.querySelectorAll('.star');
+        const ratingInput = document.querySelector('input[name="calificacion"]');
+        const ratingText = document.getElementById('rating-text');
+        
+        const ratingLabels = {
+            1: '⭐ Muy malo',
+            2: '⭐⭐ Malo',
+            3: '⭐⭐⭐ Regular',
+            4: '⭐⭐⭐⭐ Bueno',
+            5: '⭐⭐⭐⭐⭐ Excelente'
+        };
+        
+        // Función para actualizar las estrellas
+        function updateStars(rating) {
+            stars.forEach((star, index) => {
+                if (index < rating) {
+                    star.textContent = '⭐';
+                    star.classList.add('active');
+                } else {
+                    star.textContent = '☆';
+                    star.classList.remove('active');
+                }
+            });
+            
+            if (rating > 0) {
+                ratingText.textContent = ratingLabels[rating];
+                ratingInput.value = rating;
+            } else {
+                ratingText.textContent = '';
+            }
+        }
+        
+        // Event listeners para las estrellas
+        stars.forEach(star => {
+            star.addEventListener('click', function() {
+                const value = parseInt(this.dataset.value);
+                updateStars(value);
+            });
+            
+            star.addEventListener('mouseenter', function() {
+                const value = parseInt(this.dataset.value);
+                updateStars(value);
+            });
+        });
+        
+        // Restaurar calificación al salir
+        document.getElementById('star-rating').addEventListener('mouseleave', function() {
+            const currentValue = parseInt(ratingInput.value) || 0;
+            updateStars(currentValue);
+        });
+        
+        // Inicializar con valor actual si existe
+        const currentValue = parseInt(ratingInput.value) || 0;
+        if (currentValue > 0) {
+            updateStars(currentValue);
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,57 @@
+{% extends "admin/index.html" %}
+{% load static %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+    /* Estilo para las tarjetas del dashboard */
+    .module h2, .module caption {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+        color: white !important;
+        padding: 12px 15px !important;
+        border-radius: 8px 8px 0 0 !important;
+    }
+    
+    .module {
+        border-radius: 8px !important;
+        overflow: hidden !important;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+        margin-bottom: 20px !important;
+    }
+    
+    /* Mejorar tabla de acciones recientes */
+    #recent-actions-module h2 {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    }
+    
+    #content-main {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+    }
+    
+    /* Estadísticas en el dashboard */
+    .dashboard .module table th {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+        color: white !important;
+    }
+    
+    /* Hover en las filas de la tabla */
+    .dashboard .module table tr:hover {
+        background-color: #f0f0f0 !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+    <h2 style="color: #667eea; margin: 0 0 10px 0; display: flex; align-items: center; gap: 10px;">
+        <span style="font-size: 32px;">👋</span>
+        <span>Bienvenido al Panel de Administración</span>
+    </h2>
+    <p style="color: #666; margin: 0;">
+        Gestiona el Sistema de Triage Psicosocial desde aquí. Puedes administrar solicitudes, encuentros y calificaciones.
+    </p>
+</div>
+{{ block.super }}
+{% endblock %}

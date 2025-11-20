@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}Error del servidor - 500{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto text-center py-16">
+    <div class="text-8xl mb-6">⚠️</div>
+    <h1 class="text-5xl font-bold text-gray-800 mb-4">Error 500</h1>
+    <p class="text-xl text-gray-600 mb-8">Algo salió mal en el servidor</p>
+    <a href="{% url 'solicitudes:inicio' %}" 
+       class="inline-block bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold">
+        🏠 Volver al Inicio
+    </a>
+</div>
+{% endblock %}

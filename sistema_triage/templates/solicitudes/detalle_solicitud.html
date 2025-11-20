@@ -1,0 +1,202 @@
+{% extends 'base.html' %}
+
+{% block title %}Detalle de Solicitud #{{ solicitud.id }} - Sistema de Triage{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto">
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-indigo-600 to-purple-700 rounded-lg shadow-xl p-8 mb-8 text-white">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-4xl font-bold mb-2">Solicitud #{{ solicitud.id }}</h1>
+                <p class="text-indigo-100 text-lg">{{ solicitud.nombre_completo }}</p>
+            </div>
+            <div class="text-right">
+                <div class="text-sm text-indigo-100 mb-1">Fecha de creación</div>
+                <div class="text-xl font-bold">{{ solicitud.fecha_creacion|date:"d/m/Y H:i" }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Grid de información -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        <!-- Información Básica -->
+        <div class="lg:col-span-2 space-y-6">
+            <!-- Card: Información Personal -->
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+                <div class="bg-gradient-to-r from-blue-500 to-blue-600 px-6 py-4">
+                    <h2 class="text-2xl font-bold text-white flex items-center gap-2">
+                        <span>👤</span> Información Personal
+                    </h2>
+                </div>
+                <div class="p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <div class="text-sm text-gray-600 mb-1">Nombre Completo</div>
+                            <div class="font-semibold text-gray-800">{{ solicitud.nombre_completo }}</div>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <div class="text-sm text-gray-600 mb-1">Cédula</div>
+                            <div class="font-semibold text-gray-800">{{ solicitud.cedula }}</div>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <div class="text-sm text-gray-600 mb-1">Edad</div>
+                            <div class="font-semibold text-gray-800">{{ solicitud.edad }} años</div>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <div class="text-sm text-gray-600 mb-1">Género</div>
+                            <div class="font-semibold text-gray-800">{{ solicitud.get_genero_display }}</div>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <div class="text-sm text-gray-600 mb-1">Correo Electrónico</div>
+                            <div class="font-semibold text-gray-800">{{ solicitud.correo_electronico }}</div>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <div class="text-sm text-gray-600 mb-1">Celular</div>
+                            <div class="font-semibold text-gray-800">{{ solicitud.celular }}</div>
+                        </div>
+                    </div>
+                    <div class="mt-4 bg-gray-50 rounded-lg p-4">
+                        <div class="text-sm text-gray-600 mb-1">Dirección</div>
+                        <div class="font-semibold text-gray-800">{{ solicitud.direccion }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card: Descripción del Problema -->
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+                <div class="bg-gradient-to-r from-orange-500 to-red-600 px-6 py-4">
+                    <h2 class="text-2xl font-bold text-white flex items-center gap-2">
+                        <span>📝</span> Descripción del Problema
+                    </h2>
+                </div>
+                <div class="p-6">
+                    <p class="text-gray-700 whitespace-pre-line">{{ solicitud.descripcion_problema }}</p>
+                </div>
+            </div>
+
+            {% if solicitud.informacion_adicional %}
+            <!-- Card: Información Adicional -->
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+                <div class="bg-gradient-to-r from-purple-500 to-indigo-600 px-6 py-4">
+                    <h2 class="text-2xl font-bold text-white flex items-center gap-2">
+                        <span>ℹ️</span> Información Adicional
+                    </h2>
+                </div>
+                <div class="p-6">
+                    <p class="text-gray-700 whitespace-pre-line">{{ solicitud.informacion_adicional }}</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Sidebar -->
+        <div class="space-y-6">
+            <!-- Card: Estado y Urgencia -->
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+                <div class="bg-gradient-to-r from-gray-700 to-gray-800 px-6 py-4">
+                    <h3 class="text-xl font-bold text-white">Estado de Solicitud</h3>
+                </div>
+                <div class="p-6 space-y-4">
+                    <!-- Urgencia -->
+                    <div>
+                        <div class="text-sm text-gray-600 mb-2">Nivel de Urgencia</div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-2xl">
+                                {% if solicitud.urgencia == 'crisis' %}🚨
+                                {% elif solicitud.urgencia == 'alta' %}⚠️
+                                {% elif solicitud.urgencia == 'media' %}📋
+                                {% else %}✅
+                                {% endif %}
+                            </span>
+                            <span class="px-3 py-1 rounded-full text-sm font-bold
+                                {% if solicitud.urgencia == 'crisis' %}bg-red-100 text-red-700
+                                {% elif solicitud.urgencia == 'alta' %}bg-orange-100 text-orange-700
+                                {% elif solicitud.urgencia == 'media' %}bg-yellow-100 text-yellow-700
+                                {% else %}bg-green-100 text-green-700
+                                {% endif %}">
+                                {{ solicitud.get_urgencia_display }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="border-t pt-4">
+                        <div class="text-sm text-gray-600 mb-2">Estado Actual</div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-2xl">
+                                {% if solicitud.estado == 'completado' %}✅
+                                {% elif solicitud.estado == 'programado' %}📅
+                                {% elif solicitud.estado == 'atencion_inmediata' %}🚨
+                                {% else %}⏳
+                                {% endif %}
+                            </span>
+                            <span class="font-semibold text-gray-800">{{ solicitud.get_estado_display }}</span>
+                        </div>
+                    </div>
+
+                    {% if solicitud.estado != 'completado' %}
+                    <div class="border-t pt-4">
+                        <a href="{% url 'encuentros:programar_encuentro' solicitud.id %}" 
+                           class="block w-full bg-gradient-to-r from-green-600 to-green-700 text-white px-4 py-3 rounded-lg hover:from-green-700 hover:to-green-800 transition-all shadow-lg text-center font-bold">
+                            📅 Programar Encuentro
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Card: Información Demográfica -->
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+                <div class="bg-gradient-to-r from-green-500 to-green-600 px-6 py-4">
+                    <h3 class="text-xl font-bold text-white">Info Demográfica</h3>
+                </div>
+                <div class="p-6 space-y-3">
+                    <div>
+                        <div class="text-sm text-gray-600">Grupo Raizal</div>
+                        <div class="font-semibold text-gray-800">{{ solicitud.get_grupo_raizal_display }}</div>
+                    </div>
+                    <div class="border-t pt-3">
+                        <div class="text-sm text-gray-600">Discapacidad</div>
+                        <div class="font-semibold text-gray-800">{{ solicitud.get_discapacidad_display }}</div>
+                        {% if solicitud.descripcion_discapacidad %}
+                            <div class="text-sm text-gray-600 mt-2">{{ solicitud.descripcion_discapacidad }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card: Sesiones -->
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+                <div class="bg-gradient-to-r from-yellow-500 to-orange-500 px-6 py-4">
+                    <h3 class="text-xl font-bold text-white">Progreso</h3>
+                </div>
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-sm text-gray-600">Sesiones</span>
+                        <span class="font-bold text-gray-800">{{ solicitud.sesiones_completadas }} / {{ solicitud.max_sesiones }}</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-3">
+                        <div class="bg-gradient-to-r from-yellow-500 to-orange-500 h-3 rounded-full transition-all" 
+                             style="width: {{ solicitud.porcentaje_sesiones }}%"></div>
+                    </div>
+                    <div class="text-sm text-gray-600 mt-2">
+                        {% if solicitud.sesiones_restantes > 0 %}
+                            {{ solicitud.sesiones_restantes }} sesión{% if solicitud.sesiones_restantes != 1 %}es{% endif %} restante{% if solicitud.sesiones_restantes != 1 %}s{% endif %}
+                        {% else %}
+                            Todas las sesiones completadas
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Botones -->
+    <div class="flex gap-4">
+        <a href="{% url 'solicitudes:inicio' %}" 
+           class="flex-1 bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300 transition-colors text-center font-bold">
+            ← Volver al Inicio
+        </a>
+    </div>
+</div>
+{% endblock %}

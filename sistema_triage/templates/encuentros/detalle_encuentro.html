@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+
+{% block title %}Detalle del Encuentro #{{ encuentro.id }} - Sistema de Triage{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-lg shadow-xl p-8 mb-8 text-white">
+        <div class="flex items-center gap-4">
+            <div class="text-5xl">📋</div>
+            <div>
+                <h1 class="text-4xl font-bold mb-2">Encuentro #{{ encuentro.id }}</h1>
+                <p class="text-blue-100 text-lg">Detalles del encuentro virtual</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Estado -->
+    <div class="bg-white rounded-lg shadow-lg overflow-hidden mb-6">
+        <div class="p-6">
+            <div class="flex items-center justify-center gap-4">
+                <span class="text-4xl">
+                    {% if encuentro.estado == 'completado' %}✅
+                    {% elif encuentro.estado == 'programado' %}📅
+                    {% elif encuentro.estado == 'en_progreso' %}🔄
+                    {% else %}❌
+                    {% endif %}
+                </span>
+                <div>
+                    <div class="text-sm text-gray-600">Estado del Encuentro</div>
+                    <div class="text-2xl font-bold">{{ encuentro.get_estado_display }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Información del trabajador social -->
+    <div class="bg-white rounded-lg shadow-lg overflow-hidden mb-6">
+        <div class="bg-gradient-to-r from-green-500 to-green-600 px-6 py-4">
+            <h2 class="text-2xl font-bold text-white">👨‍💼 Trabajador Social</h2>
+        </div>
+        <div class="p-6">
+            <div class="flex items-center gap-6">
+                <div class="bg-green-100 rounded-full w-20 h-20 flex items-center justify-center text-3xl">
+                    👨‍💼
+                </div>
+                <div class="flex-1">
+                    <h3 class="text-2xl font-bold text-gray-800">
+                        {{ encuentro.trabajador_social.user.get_full_name }}
+                    </h3>
+                    <p class="text-gray-600">{{ encuentro.trabajador_social.especialidad }}</p>
+                    <p class="text-gray-600">📞 {{ encuentro.trabajador_social.telefono }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fecha y duración -->
+    <div class="bg-white rounded-lg shadow-lg overflow-hidden mb-6">
+        <div class="bg-gradient-to-r from-blue-500 to-blue-600 px-6 py-4">
+            <h2 class="text-2xl font-bold text-white">📅 Información del Encuentro</h2>
+        </div>
+        <div class="p-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-gray-50 rounded-lg p-6">
+                    <div class="text-sm text-gray-600 mb-2">Fecha Programada</div>
+                    <div class="text-2xl font-bold text-gray-800">
+                        {{ encuentro.fecha_programada|date:"d/m/Y" }}
+                    </div>
+                    <div class="text-lg text-gray-600">
+                        {{ encuentro.fecha_programada|date:"H:i" }}
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 rounded-lg p-6">
+                    <div class="text-sm text-gray-600 mb-2">Duración Estimada</div>
+                    <div class="text-2xl font-bold text-gray-800">
+                        {{ encuentro.duracion_estimada }} minutos
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if encuentro.solicitud %}
+    <!-- Información de la solicitud -->
+    <div class="bg-white rounded-lg shadow-lg overflow-hidden mb-6">
+        <div class="bg-gradient-to-r from-purple-500 to-purple-600 px-6 py-4">
+            <h2 class="text-2xl font-bold text-white">📝 Solicitud Asociada</h2>
+        </div>
+        <div class="p-6">
+            <a href="{% url 'solicitudes:detalle_solicitud' encuentro.solicitud.id %}"
+               class="block p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <div class="font-bold text-lg text-gray-800">
+                            Solicitud #{{ encuentro.solicitud.id }}
+                        </div>
+                        <div class="text-gray-600">
+                            {{ encuentro.solicitud.nombre_completo }}
+                        </div>
+                    </div>
+                    <div class="text-purple-600">
+                        Ver detalles →
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Botones -->
+    <div class="flex gap-4">
+        <a href="{% url 'encuentros:lista_encuentros' %}" 
+           class="flex-1 bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300 transition-colors text-center font-bold">
+            ← Volver a Encuentros
+        </a>
+    </div>
+</div>
+{% endblock %}

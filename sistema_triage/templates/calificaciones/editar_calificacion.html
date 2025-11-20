@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block title %}Editar Calificación{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <div class="bg-white rounded-lg shadow-lg p-8">
+        <h1 class="text-3xl font-bold text-gray-800 mb-2">
+            ✏️ Editar Calificación
+        </h1>
+        <p class="text-gray-600 mb-6">Modifica los datos de la calificación de {{ calificacion.nombre }}</p>
+        
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Nombre completo
+                </label>
+                {{ form.nombre }}
+                {% if form.nombre.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.nombre.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Calificación (1-5 estrellas)
+                </label>
+                {{ form.calificacion }}
+                {% if form.calificacion.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.calificacion.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Comentario
+                </label>
+                {{ form.comentario }}
+                {% if form.comentario.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.comentario.errors.0 }}</p>
+                {% endif %}
+            </div>
+            
+            <div class="flex gap-4">
+                <button type="submit" 
+                        class="flex-1 bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors font-semibold">
+                    💾 Guardar Cambios
+                </button>
+                <a href="{% url 'calificaciones:detalle_calificacion_cbv' calificacion.pk %}" 
+                   class="flex-1 text-center bg-gray-300 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-400 transition-colors font-semibold">
+                    ❌ Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    form input[type="text"],
+    form input[type="number"],
+    form textarea,
+    form select {
+        width: 100%;
+        padding: 0.75rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 0.5rem;
+        font-size: 1rem;
+    }
+    form input:focus,
+    form textarea:focus,
+    form select:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    form textarea {
+        min-height: 120px;
+        resize: vertical;
+    }
+</style>
+{% endblock %}

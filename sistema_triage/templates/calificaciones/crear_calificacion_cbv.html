@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block title %}Crear Calificación (CBV){% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <div class="bg-white rounded-lg shadow-lg p-8">
+        <h1 class="text-3xl font-bold text-gray-800 mb-6">
+            ⭐ Crear Nueva Calificación (CBV)
+        </h1>
+        
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
+            
+            {% for field in form %}
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        {{ field.label }}
+                    </label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ field.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            
+            <div class="flex gap-4">
+                <button type="submit" 
+                        class="flex-1 bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors">
+                    💾 Guardar Calificación
+                </button>
+                <a href="{% url 'calificaciones:lista_calificaciones_cbv' %}" 
+                   class="flex-1 text-center bg-gray-300 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-400 transition-colors">
+                    ← Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    form input[type="text"],
+    form input[type="number"],
+    form textarea,
+    form select {
+        width: 100%;
+        padding: 0.75rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 0.5rem;
+        font-size: 1rem;
+    }
+    form input:focus,
+    form textarea:focus,
+    form select:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+</style>
+{% endblock %}
+
+

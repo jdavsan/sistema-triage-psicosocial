@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block title %}Inicio - Sistema de Triage{% endblock %}
+
+{% block content %}
+<div class="text-center py-12">
+    <h1 class="text-5xl font-bold text-gray-800 mb-4">
+        🏥 Bienvenido al Sistema de Triage
+    </h1>
+    <p class="text-xl text-gray-600 mb-8">
+        Plataforma profesional para gestión de solicitudes de ayuda psicosocial
+    </p>
+</div>
+
+<!-- Cards de servicios -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+    <!-- Card 1: Nueva Solicitud -->
+    <div class="bg-white rounded-lg shadow-lg p-6 hover:shadow-2xl transition-all transform hover:-translate-y-2">
+        <div class="text-center">
+            <div class="text-5xl mb-4">
+                <i class="fas fa-file-medical text-blue-600"></i>
+            </div>
+            <h3 class="text-2xl font-bold text-gray-800 mb-3">Nueva Solicitud</h3>
+            <p class="text-gray-600 mb-4">
+                Crea una nueva solicitud de ayuda psicosocial con clasificación automática por urgencia
+            </p>
+            <a href="{% url 'solicitudes:crear_solicitud' %}" 
+               class="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">
+                Crear Solicitud
+            </a>
+        </div>
+    </div>
+
+    <!-- Card 2: Encuentros -->
+    <div class="bg-white rounded-lg shadow-lg p-6 hover:shadow-2xl transition-all transform hover:-translate-y-2">
+        <div class="text-center">
+            <div class="text-5xl mb-4">
+                <i class="fas fa-users text-green-600"></i>
+            </div>
+            <h3 class="text-2xl font-bold text-gray-800 mb-3">Encuentros Virtuales</h3>
+            <p class="text-gray-600 mb-4">
+                Programa y gestiona encuentros virtuales con trabajadores sociales
+            </p>
+            <a href="{% url 'encuentros:lista_encuentros' %}" 
+               class="inline-block bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors">
+                Ver Encuentros
+            </a>
+        </div>
+    </div>
+
+    <!-- Card 3: Calificaciones -->
+    <div class="bg-white rounded-lg shadow-lg p-6 hover:shadow-2xl transition-all transform hover:-translate-y-2">
+        <div class="text-center">
+            <div class="text-5xl mb-4">
+                <i class="fas fa-star text-yellow-500"></i>
+            </div>
+            <h3 class="text-2xl font-bold text-gray-800 mb-3">Califica el Servicio</h3>
+            <p class="text-gray-600 mb-4">
+                Ayúdanos a mejorar calificando tu experiencia con nuestro servicio
+            </p>
+            <a href="{% url 'calificaciones:crear_calificacion' %}" 
+               class="inline-block bg-yellow-500 text-white px-6 py-3 rounded-lg hover:bg-yellow-600 transition-colors">
+                Calificar Ahora
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Procedimiento -->
+<div class="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-lg shadow-xl p-8 text-white">
+    <h2 class="text-3xl font-bold text-center mb-8">¿Cómo funciona?</h2>
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div class="text-center">
+            <div class="text-4xl mb-2">1️⃣</div>
+            <h4 class="font-bold mb-2">Crea tu Solicitud</h4>
+            <p class="text-sm opacity-90">Describe tu situación y necesidad de ayuda</p>
+        </div>
+        <div class="text-center">
+            <div class="text-4xl mb-2">2️⃣</div>
+            <h4 class="font-bold mb-2">Evaluación Automática</h4>
+            <p class="text-sm opacity-90">El sistema clasifica la urgencia</p>
+        </div>
+        <div class="text-center">
+            <div class="text-4xl mb-2">3️⃣</div>
+            <h4 class="font-bold mb-2">Atención Profesional</h4>
+            <p class="text-sm opacity-90">Un trabajador social te contactará</p>
+        </div>
+        <div class="text-center">
+            <div class="text-4xl mb-2">4️⃣</div>
+            <h4 class="font-bold mb-2">Seguimiento</h4>
+            <p class="text-sm opacity-90">Monitoreo continuo de tu caso</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

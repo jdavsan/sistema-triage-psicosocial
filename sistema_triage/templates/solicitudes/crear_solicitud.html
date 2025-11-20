@@ -1,0 +1,612 @@
+{% extends 'base.html' %}
+
+{% block title %}Nueva Solicitud de Ayuda - Sistema de Triage{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto">
+    <!-- Alerta de errores generales -->
+    {% if form.errors %}
+    <div class="bg-red-100 border-l-4 border-red-500 rounded-lg p-6 mb-6 shadow-lg animate-shake">
+        <div class="flex items-start gap-4">
+            <div class="text-4xl">⚠️</div>
+            <div class="flex-1">
+                <h3 class="text-xl font-bold text-red-800 mb-2">Hay {{ form.errors|length }} error{% if form.errors|length != 1 %}es{% endif %} en el formulario</h3>
+                <p class="text-red-700 mb-3">Por favor corrija los siguientes campos:</p>
+                <ul class="list-disc list-inside space-y-1">
+                    {% for field in form %}
+                        {% if field.errors %}
+                            <li class="text-red-700 font-semibold">
+                                📍 {{ field.label }}: 
+                                {% for error in field.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    {% for error in form.non_field_errors %}
+                        <li class="text-red-700 font-semibold">📍 {{ error }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Header mejorado -->
+    <div class="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-lg shadow-xl p-8 mb-8 text-white">
+        <div class="flex items-center gap-4">
+            <div class="text-5xl">📋</div>
+            <div>
+                <h1 class="text-4xl font-bold mb-2">Nueva Solicitud de Ayuda</h1>
+                <p class="text-blue-100 text-lg">Complete toda la información requerida para procesar su solicitud</p>
+            </div>
+        </div>
+    </div>
+
+    <form method="post" class="space-y-6" id="solicitudForm">
+        {% csrf_token %}
+        
+                <!-- Sección: Información Personal -->
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+            <div class="bg-gradient-to-r from-blue-500 to-blue-600 px-6 py-4">
+                <h2 class="text-2xl font-bold text-white flex items-center gap-2">
+                    <span>👤</span> Información Personal
+                </h2>
+            </div>
+            
+            <div class="p-6 space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Nombre completo -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Nombre completo <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" 
+                               name="{{ form.nombre_completo.name }}" 
+                               value="{{ form.nombre_completo.value|default:'' }}"
+                               placeholder="Ej: María González Pérez"
+                               class="w-full px-4 py-3 border-2 rounded-lg transition-all
+                                      {% if form.nombre_completo.errors %}border-red-500
+                                      {% else %}border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200{% endif %}">
+                        {% if form.nombre_completo.errors %}
+                            <div class="mt-2 flex items-start gap-2 text-red-600 text-sm font-semibold bg-red-50 p-3 rounded-lg animate-fade-in">
+                                <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                </svg>
+                                <span>{{ form.nombre_completo.errors.0 }}</span>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Cédula -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Cédula <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" 
+                               name="{{ form.cedula.name }}" 
+                               value="{{ form.cedula.value|default:'' }}"
+                               placeholder="Ej: 12345678"
+                               class="w-full px-4 py-3 border-2 rounded-lg transition-all
+                                      {% if form.cedula.errors %}border-red-500
+                                      {% else %}border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200{% endif %}">
+                        {% if form.cedula.errors %}
+                            <div class="mt-2 flex items-start gap-2 text-red-600 text-sm font-semibold bg-red-50 p-3 rounded-lg animate-fade-in">
+                                <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                </svg>
+                                <span>{{ form.cedula.errors.0 }}</span>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Edad -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Edad <span class="text-red-500">*</span>
+                        </label>
+                        <input type="number" 
+                               name="{{ form.edad.name }}" 
+                               value="{{ form.edad.value|default:'' }}"
+                               placeholder="Ej: 25"
+                               min="1"
+                               max="120"
+                               class="w-full px-4 py-3 border-2 rounded-lg transition-all
+                                      {% if form.edad.errors %}border-red-500
+                                      {% else %}border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200{% endif %}">
+                        {% if form.edad.errors %}
+                            <div class="mt-2 flex items-start gap-2 text-red-600 text-sm font-semibold bg-red-50 p-3 rounded-lg animate-fade-in">
+                                <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                </svg>
+                                <span>{{ form.edad.errors.0 }}</span>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Celular -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Celular <span class="text-red-500">*</span>
+                        </label>
+                        <input type="tel" 
+                               name="{{ form.celular.name }}" 
+                               value="{{ form.celular.value|default:'' }}"
+                               placeholder="Ej: 3001234567"
+                               class="w-full px-4 py-3 border-2 rounded-lg transition-all
+                                      {% if form.celular.errors %}border-red-500
+                                      {% else %}border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200{% endif %}">
+                        {% if form.celular.errors %}
+                            <div class="mt-2 flex items-start gap-2 text-red-600 text-sm font-semibold bg-red-50 p-3 rounded-lg animate-fade-in">
+                                <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                </svg>
+                                <span>{{ form.celular.errors.0 }}</span>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Género -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Género <span class="text-red-500">*</span>
+                        </label>
+                        <select name="{{ form.genero.name }}" 
+                                class="w-full px-4 py-3 border-2 rounded-lg transition-all
+                                       {% if form.genero.errors %}border-red-500
+                                       {% else %}border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200{% endif %}">
+                            <option value="">---------</option>
+                            {% for value, label in form.genero.field.choices %}
+                                <option value="{{ value }}" {% if form.genero.value == value %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                        {% if form.genero.errors %}
+                            <div class="mt-2 flex items-start gap-2 text-red-600 text-sm font-semibold bg-red-50 p-3 rounded-lg animate-fade-in">
+                                <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                </svg>
+                                <span>{{ form.genero.errors.0 }}</span>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Correo electrónico -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Correo electrónico <span class="text-red-500">*</span>
+                        </label>
+                        <input type="email" 
+                               name="{{ form.correo_electronico.name }}" 
+                               value="{{ form.correo_electronico.value|default:'' }}"
+                               placeholder="ejemplo@correo.com"
+                               class="w-full px-4 py-3 border-2 rounded-lg transition-all
+                                      {% if form.correo_electronico.errors %}border-red-500
+                                      {% else %}border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200{% endif %}">
+                        {% if form.correo_electronico.errors %}
+                            <div class="mt-2 flex items-start gap-2 text-red-600 text-sm font-semibold bg-red-50 p-3 rounded-lg animate-fade-in">
+                                <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                </svg>
+                                <span>{{ form.correo_electronico.errors.0 }}</span>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Confirmar correo electrónico -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Confirmar correo electrónico <span class="text-red-500">*</span>
+                        </label>
+                        <input type="email" 
+                               name="confirmar_correo" 
+                               value="{{ form.confirmar_correo.value|default:'' }}"
+                               placeholder="Confirme su correo electrónico"
+                               class="w-full px-4 py-3 border-2 rounded-lg transition-all
+                                      {% if form.confirmar_correo.errors %}border-red-500
+                                      {% else %}border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200{% endif %}">
+                        {% if form.confirmar_correo.errors %}
+                            <div class="mt-2 flex items-start gap-2 text-red-600 text-sm font-semibold bg-red-50 p-3 rounded-lg animate-fade-in">
+                                <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                </svg>
+                                <span>{{ form.confirmar_correo.errors.0 }}</span>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Dirección -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        Dirección de residencia <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" 
+                           name="{{ form.direccion.name }}" 
+                           value="{{ form.direccion.value|default:'' }}"
+                           placeholder="Dirección completa incluyendo ciudad y barrio"
+                           class="w-full px-4 py-3 border-2 rounded-lg transition-all
+                                  {% if form.direccion.errors %}border-red-500
+                                  {% else %}border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200{% endif %}">
+                    {% if form.direccion.errors %}
+                        <div class="mt-2 flex items-start gap-2 text-red-600 text-sm font-semibold bg-red-50 p-3 rounded-lg animate-fade-in">
+                            <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                            </svg>
+                            <span>{{ form.direccion.errors.0 }}</span>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección: Información Demográfica -->
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+            <div class="bg-gradient-to-r from-green-500 to-green-600 px-6 py-4">
+                <h2 class="text-2xl font-bold text-white flex items-center gap-2">
+                    <span>🌍</span> Información Demográfica
+                </h2>
+            </div>
+            
+            <div class="p-6 space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Grupo raizal -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-3">
+                            ¿Pertenece a algún grupo raizal o étnico? <span class="text-red-500">*</span>
+                        </label>
+                        {{ form.grupo_raizal }}
+                        {% if form.grupo_raizal.errors %}
+                            <div class="mt-2 flex items-start gap-2 text-red-600 text-sm font-semibold bg-red-50 p-3 rounded-lg animate-fade-in">
+                                <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                </svg>
+                                <span>{{ form.grupo_raizal.errors.0 }}</span>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Discapacidad -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-3">
+                            ¿Tiene alguna discapacidad? <span class="text-red-500">*</span>
+                        </label>
+                        {{ form.discapacidad }}
+                        {% if form.discapacidad.errors %}
+                            <div class="mt-2 flex items-start gap-2 text-red-600 text-sm font-semibold bg-red-50 p-3 rounded-lg animate-fade-in">
+                                <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                </svg>
+                                <span>{{ form.discapacidad.errors.0 }}</span>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Descripción de discapacidad -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        Describa su discapacidad (si aplica)
+                    </label>
+                    <textarea name="{{ form.descripcion_discapacidad.name }}" 
+                              rows="3"
+                              placeholder="Describa brevemente su discapacidad si aplica"
+                              class="form-input {% if form.descripcion_discapacidad.errors %}border-red-500 border-2{% else %}border-gray-300{% endif %}">{{ form.descripcion_discapacidad.value|default:'' }}</textarea>
+                    {% if form.descripcion_discapacidad.errors %}
+                        <div class="mt-2 flex items-start gap-2 text-red-600 text-sm font-semibold bg-red-50 p-3 rounded-lg animate-fade-in">
+                            <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                            </svg>
+                            <span>{{ form.descripcion_discapacidad.errors.0 }}</span>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección: Descripción del Problema -->
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+            <div class="bg-gradient-to-r from-orange-500 to-orange-600 px-6 py-4">
+                <h2 class="text-2xl font-bold text-white flex items-center gap-2">
+                    <span>📝</span> Descripción del Problema
+                </h2>
+            </div>
+            
+            <div class="p-6 space-y-6">
+                <!-- Nivel de urgencia -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        Nivel de urgencia <span class="text-red-500">*</span>
+                    </label>
+                    <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 mb-3">
+                        <p class="text-sm text-yellow-800">
+                            <strong>Nota:</strong> Seleccione "Crisis" solo si necesita atención inmediata por riesgo inminente.
+                        </p>
+                    </div>
+                    <select name="{{ form.urgencia.name }}" 
+                            class="form-input {% if form.urgencia.errors %}border-red-500 border-2{% else %}border-gray-300{% endif %}">
+                        {% for value, label in form.urgencia.field.choices %}
+                            <option value="{{ value }}" {% if form.urgencia.value == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.urgencia.errors %}
+                        <div class="mt-2 flex items-start gap-2 text-red-600 text-sm font-semibold bg-red-50 p-3 rounded-lg animate-fade-in">
+                            <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                            </svg>
+                            <span>{{ form.urgencia.errors.0 }}</span>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Descripción del problema -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        Describa su situación <span class="text-red-500">*</span>
+                    </label>
+                    <p class="text-sm text-gray-600 mb-2">
+                        Por favor, describa detalladamente su situación actual y por qué necesita ayuda.
+                    </p>
+                    <textarea name="{{ form.descripcion_problema.name }}" 
+                              rows="5"
+                              placeholder="Describa detalladamente su situación..."
+                              class="form-input {% if form.descripcion_problema.errors %}border-red-500 border-2{% else %}border-gray-300{% endif %}">{{ form.descripcion_problema.value|default:'' }}</textarea>
+                    {% if form.descripcion_problema.errors %}
+                        <div class="mt-2 flex items-start gap-2 text-red-600 text-sm font-semibold bg-red-50 p-3 rounded-lg animate-fade-in">
+                            <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                            </svg>
+                            <span>{{ form.descripcion_problema.errors.0 }}</span>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <!-- Sección: Términos y Condiciones -->
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+            <div class="bg-gradient-to-r from-red-500 to-red-600 px-6 py-4">
+                <h2 class="text-2xl font-bold text-white flex items-center gap-2">
+                    <span>📋</span> Términos y Condiciones
+                </h2>
+            </div>
+            
+            <div class="p-6 space-y-6">
+                <!-- Términos y condiciones -->
+                <div class="bg-blue-50 border-2 border-blue-200 rounded-lg p-6">
+                    <div class="flex items-start gap-4 mb-4">
+                        <input type="checkbox" 
+                               name="{{ form.acepta_terminos.name }}"
+                               id="id_acepta_terminos"
+                               {% if form.acepta_terminos.value %}checked{% endif %}
+                               class="mt-1 w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                        <label for="id_acepta_terminos" class="flex-1 text-gray-700">
+                            <span class="font-bold text-gray-800">Acepto los términos y condiciones</span>
+                            <span class="text-red-500">*</span>
+                            <p class="text-sm mt-2">
+                                He leído y acepto los 
+                                <a href="#" class="text-blue-600 hover:text-blue-800 underline font-semibold" onclick="event.preventDefault(); mostrarTerminos();">
+                                    términos y condiciones del servicio
+                                </a>
+                            </p>
+                        </label>
+                    </div>
+                    {% if form.acepta_terminos.errors %}
+                        <div class="flex items-start gap-2 text-red-600 text-sm font-semibold bg-red-50 p-3 rounded-lg animate-fade-in">
+                            <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                            </svg>
+                            <span>{{ form.acepta_terminos.errors.0 }}</span>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Tratamiento de datos personales -->
+                <div class="bg-green-50 border-2 border-green-200 rounded-lg p-6">
+                    <div class="flex items-start gap-4 mb-4">
+                        <input type="checkbox" 
+                               name="{{ form.acepta_tratamiento_datos.name }}"
+                               id="id_acepta_tratamiento_datos"
+                               {% if form.acepta_tratamiento_datos.value %}checked{% endif %}
+                               class="mt-1 w-5 h-5 text-green-600 border-gray-300 rounded focus:ring-green-500">
+                        <label for="id_acepta_tratamiento_datos" class="flex-1 text-gray-700">
+                            <span class="font-bold text-gray-800">Acepto el tratamiento de mis datos personales</span>
+                            <span class="text-red-500">*</span>
+                            <p class="text-sm mt-2">
+                                Autorizo el tratamiento de mis datos personales de acuerdo con la 
+                                <a href="#" class="text-green-600 hover:text-green-800 underline font-semibold" onclick="event.preventDefault(); mostrarPoliticaDatos();">
+                                    política de protección de datos personales
+                                </a>
+                                y la normativa vigente (Ley 1581 de 2012)
+                            </p>
+                        </label>
+                    </div>
+                    {% if form.acepta_tratamiento_datos.errors %}
+                        <div class="flex items-start gap-2 text-red-600 text-sm font-semibold bg-red-50 p-3 rounded-lg animate-fade-in">
+                            <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                            </svg>
+                            <span>{{ form.acepta_tratamiento_datos.errors.0 }}</span>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Información adicional -->
+                <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4">
+                    <div class="flex items-start gap-3">
+                        <div class="text-2xl">ℹ️</div>
+                        <div>
+                            <p class="text-sm text-yellow-800">
+                                <strong>Importante:</strong> Al aceptar estos términos, usted reconoce que ha sido informado sobre el uso de sus datos 
+                                personales y otorga su consentimiento libre, previo, expreso e informado para su tratamiento conforme a la finalidad 
+                                del servicio de atención psicosocial.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="flex gap-4">
+            <button type="submit" 
+                    class="flex-1 bg-gradient-to-r from-green-600 to-green-700 text-white px-8 py-4 rounded-lg hover:from-green-700 hover:to-green-800 transition-all shadow-lg hover:shadow-xl text-lg font-bold">
+                ✅ Enviar Solicitud
+            </button>
+            <a href="{% url 'solicitudes:inicio' %}" 
+               class="flex-1 text-center bg-gray-300 text-gray-700 px-8 py-4 rounded-lg hover:bg-gray-400 transition-colors text-lg font-bold">
+                ❌ Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+
+<!-- Modales para términos y políticas -->
+<div id="modalTerminos" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+        <div class="bg-gradient-to-r from-blue-600 to-indigo-600 p-6 text-white">
+            <h2 class="text-2xl font-bold">📋 Términos y Condiciones del Servicio</h2>
+        </div>
+        <div class="p-6 space-y-4">
+            <h3 class="text-xl font-bold text-gray-800">1. Objeto del Servicio</h3>
+            <p class="text-gray-700">El Sistema de Triage de Trabajo Social tiene como objetivo proporcionar atención psicosocial oportuna y clasificada según el nivel de urgencia.</p>
+            
+            <h3 class="text-xl font-bold text-gray-800">2. Responsabilidades del Usuario</h3>
+            <p class="text-gray-700">El usuario se compromete a proporcionar información veraz y actualizada sobre su situación.</p>
+            
+            <h3 class="text-xl font-bold text-gray-800">3. Confidencialidad</h3>
+            <p class="text-gray-700">Toda la información proporcionada será tratada con estricta confidencialidad conforme a las normas de protección de datos personales.</p>
+            
+            <h3 class="text-xl font-bold text-gray-800">4. Alcance del Servicio</h3>
+            <p class="text-gray-700">El servicio de atención psicosocial se realizará de acuerdo con la disponibilidad de profesionales y la urgencia clasificada.</p>
+            
+            <h3 class="text-xl font-bold text-gray-800">5. Modificaciones</h3>
+            <p class="text-gray-700">Nos reservamos el derecho de modificar estos términos en cualquier momento, notificando previamente a los usuarios.</p>
+        </div>
+        <div class="bg-gray-100 p-6 flex justify-end gap-4">
+            <button onclick="cerrarModal('modalTerminos')" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold">
+                Cerrar
+            </button>
+        </div>
+    </div>
+</div>
+
+<div id="modalPoliticaDatos" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+        <div class="bg-gradient-to-r from-green-600 to-green-700 p-6 text-white">
+            <h2 class="text-2xl font-bold">🔒 Política de Protección de Datos Personales</h2>
+        </div>
+        <div class="p-6 space-y-4">
+            <h3 class="text-xl font-bold text-gray-800">1. Responsable del Tratamiento</h3>
+            <p class="text-gray-700">Sistema de Triage - Trabajo Social es responsable del tratamiento de sus datos personales.</p>
+            
+            <h3 class="text-xl font-bold text-gray-800">2. Finalidad del Tratamiento</h3>
+            <p class="text-gray-700">Sus datos personales serán utilizados exclusivamente para:</p>
+            <ul class="list-disc list-inside text-gray-700 ml-4">
+                <li>Brindar atención psicosocial</li>
+                <li>Programar encuentros con trabajadores sociales</li>
+                <li>Realizar seguimiento a su caso</li>
+                <li>Generar estadísticas anónimas del servicio</li>
+            </ul>
+            
+            <h3 class="text-xl font-bold text-gray-800">3. Derechos del Titular</h3>
+            <p class="text-gray-700">Usted tiene derecho a:</p>
+            <ul class="list-disc list-inside text-gray-700 ml-4">
+                <li>Conocer, actualizar y rectificar sus datos personales</li>
+                <li>Solicitar prueba de la autorización otorgada</li>
+                <li>Ser informado sobre el uso de sus datos</li>
+                <li>Revocar la autorización y solicitar la supresión de datos</li>
+            </ul>
+            
+            <h3 class="text-xl font-bold text-gray-800">4. Seguridad</h3>
+            <p class="text-gray-700">Implementamos medidas de seguridad técnicas, administrativas y físicas para proteger sus datos personales.</p>
+            
+            <h3 class="text-xl font-bold text-gray-800">5. Normativa Aplicable</h3>
+            <p class="text-gray-700">Esta política se rige por la Ley 1581 de 2012 y sus decretos reglamentarios.</p>
+        </div>
+        <div class="bg-gray-100 p-6 flex justify-end gap-4">
+            <button onclick="cerrarModal('modalPoliticaDatos')" class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold">
+                Cerrar
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-input {
+        width: 100%;
+        padding: 0.75rem;
+        border: 2px solid;
+        border-radius: 0.5rem;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .form-input:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    
+    textarea.form-input {
+        resize: vertical;
+    }
+    
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+        20%, 40%, 60%, 80% { transform: translateX(5px); }
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .animate-shake {
+        animation: shake 0.5s ease-in-out;
+    }
+    
+    .animate-fade-in {
+        animation: fadeIn 0.3s ease-in;
+    }
+</style>
+
+<script>
+    // Scroll automático al primer error
+    document.addEventListener('DOMContentLoaded', function() {
+        const firstError = document.querySelector('.border-red-500');
+        if (firstError) {
+            setTimeout(() => {
+                firstError.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'center' 
+                });
+                firstError.focus();
+            }, 300);
+        }
+    });
+
+    function mostrarTerminos() {
+        document.getElementById('modalTerminos').classList.remove('hidden');
+    }
+    
+    function mostrarPoliticaDatos() {
+        document.getElementById('modalPoliticaDatos').classList.remove('hidden');
+    }
+    
+    function cerrarModal(modalId) {
+        document.getElementById(modalId).classList.add('hidden');
+    }
+    
+    // Cerrar modal al hacer clic fuera
+    document.addEventListener('click', function(event) {
+        if (event.target.id === 'modalTerminos' || event.target.id === 'modalPoliticaDatos') {
+            event.target.classList.add('hidden');
+        }
+    });
+</script>
+
+{% endblock %}

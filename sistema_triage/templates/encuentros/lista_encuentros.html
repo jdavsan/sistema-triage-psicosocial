@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+
+{% block title %}Encuentros Programados - Sistema de Triage{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-purple-600 to-indigo-700 rounded-lg shadow-xl p-8 mb-8 text-white">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <div class="text-5xl">📅</div>
+                <div>
+                    <h1 class="text-4xl font-bold mb-2">Encuentros Programados</h1>
+                    <p class="text-purple-100 text-lg">Gestiona tus sesiones con trabajadores sociales</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if encuentros %}
+        <div class="grid grid-cols-1 gap-6">
+            {% for encuentro in encuentros %}
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+                <div class="flex">
+                    <!-- Indicador de estado -->
+                    <div class="w-2 
+                        {% if encuentro.estado == 'completado' %}bg-green-500
+                        {% elif encuentro.estado == 'programado' %}bg-blue-500
+                        {% elif encuentro.estado == 'en_progreso' %}bg-yellow-500
+                        {% else %}bg-red-500
+                        {% endif %}">
+                    </div>
+                    
+                    <!-- Contenido -->
+                    <div class="flex-1 p-6">
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-3 mb-4">
+                                    <span class="text-3xl">
+                                        {% if encuentro.estado == 'completado' %}✅
+                                        {% elif encuentro.estado == 'programado' %}📅
+                                        {% elif encuentro.estado == 'en_progreso' %}🔄
+                                        {% else %}❌
+                                        {% endif %}
+                                    </span>
+                                    <div>
+                                        <h3 class="text-2xl font-bold text-gray-800">
+                                            Encuentro #{{ encuentro.id }}
+                                        </h3>
+                                        <p class="text-sm text-gray-600">
+                                            {% if encuentro.solicitud %}
+                                                Solicitud #{{ encuentro.solicitud.id }} - {{ encuentro.solicitud.nombre_completo }}
+                                            {% else %}
+                                                Sin solicitud asociada
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div class="bg-gray-50 rounded-lg p-4">
+                                        <div class="text-sm text-gray-600 mb-1">Trabajador Social</div>
+                                        <div class="font-semibold text-gray-800">
+                                            {{ encuentro.trabajador_social.user.get_full_name }}
+                                        </div>
+                                        <div class="text-sm text-gray-600">
+                                            {{ encuentro.trabajador_social.especialidad }}
+                                        </div>
+                                    </div>
+
+                                    <div class="bg-gray-50 rounded-lg p-4">
+                                        <div class="text-sm text-gray-600 mb-1">Fecha y Hora</div>
+                                        <div class="font-semibold text-gray-800">
+                                            {{ encuentro.fecha_programada|date:"d/m/Y" }}
+                                        </div>
+                                        <div class="text-sm text-gray-600">
+                                            {{ encuentro.fecha_programada|date:"H:i" }}
+                                        </div>
+                                    </div>
+
+                                    <div class="bg-gray-50 rounded-lg p-4">
+                                        <div class="text-sm text-gray-600 mb-1">Duración</div>
+                                        <div class="font-semibold text-gray-800">
+                                            {{ encuentro.duracion_estimada }} minutos
+                                        </div>
+                                        <div class="text-sm">
+                                            <span class="px-2 py-1 rounded-full text-xs font-bold
+                                                {% if encuentro.estado == 'completado' %}bg-green-100 text-green-700
+                                                {% elif encuentro.estado == 'programado' %}bg-blue-100 text-blue-700
+                                                {% elif encuentro.estado == 'en_progreso' %}bg-yellow-100 text-yellow-700
+                                                {% else %}bg-red-100 text-red-700
+                                                {% endif %}">
+                                                {{ encuentro.get_estado_display }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="ml-6">
+                                <a href="{% url 'encuentros:detalle_encuentro' encuentro.id %}" 
+                                   class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-semibold">
+                                    Ver Detalle →
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="bg-white rounded-lg shadow-lg p-12 text-center">
+            <div class="text-6xl mb-4">📅</div>
+            <h3 class="text-2xl font-bold text-gray-800 mb-2">No hay encuentros programados</h3>
+            <p class="text-gray-600 mb-6">Aún no se han programado encuentros virtuales.</p>
+            <a href="{% url 'solicitudes:inicio' %}" 
+               class="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold">
+                Ir al Inicio
+            </a>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+    .filter-btn {
+        background-color: #f3f4f6;
+        color: #6b7280;
+    }
+    
+    .filter-btn:hover {
+        background-color: #e5e7eb;
+    }
+    
+    .filter-btn.active {
+        background: linear-gradient(to right, #7c3aed, #4f46e5);
+        color: white;
+    }
+</style>
+
+<script>
+    function filterEncuentros(estado) {
+        const encuentros = document.querySelectorAll('.encuentro-item');
+        const buttons = document.querySelectorAll('.filter-btn');
+        
+        // Actualizar botones activos
+        buttons.forEach(btn => {
+            if (btn.dataset.filter === estado) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+        
+        // Filtrar encuentros
+        encuentros.forEach(encuentro => {
+            if (estado === 'todos' || encuentro.dataset.estado === estado) {
+                encuentro.style.display = 'block';
+            } else {
+                encuentro.style.display = 'none';
+            }
+        });
+    }
+</script>
+{% endblock %}
