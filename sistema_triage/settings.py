@@ -9,7 +9,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 TESTING = 'test' in sys.argv
 
 # Configuración de seguridad
-SECRET_KEY = config('SECRET_KEY', default='django-insecure-CHANGE-THIS-IN-PRODUCTION')
+SECRET_KEY = config('SECRET_KEY')
 DEBUG = config('DEBUG', default=False, cast=bool)
 
 # Hosts permitidos
@@ -88,8 +88,6 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-
-# Configuración de WhiteNoise para servir archivos estáticos en producción
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Archivos media
@@ -98,17 +96,27 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# ⭐ CONFIGURACIÓN CRÍTICA PARA RAILWAY ⭐
+# Confiar en el proxy de Railway para HTTPS
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# CSRF y cookies seguros
+CSRF_TRUSTED_ORIGINS = [
+    'https://web-production-e0c66.up.railway.app',
+    'https://*.railway.app',
+]
+
 # Configuración de seguridad para producción
 if not DEBUG:
-    SECURE_SSL_REDIRECT = True
+    # NO forzar HTTPS redirect porque Railway ya lo maneja
+    SECURE_SSL_REDIRECT = False  # ⭐ CAMBIO IMPORTANTE
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
     X_FRAME_OPTIONS = 'DENY'
-
-
-CSRF_TRUSTED_ORIGINS = [
-    'https://web-production-e0c66.up.railway.app',
-    'https://*.railway.app',
-]
+else:
+    # En desarrollo local
+    SECURE_SSL_REDIRECT = False
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
