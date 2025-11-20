@@ -12,7 +12,7 @@ from bson import ObjectId
 import pytz
 
 
-# Conexion a MongoDB Atlas
+# Conexión a MongoDB Atlas
 MONGODB_URI = settings.MONGODB_URI if hasattr(settings, 'MONGODB_URI') else "mongodb+srv://admin_triage:Cyb3rN3t78**@sistema-triage.f1qgnh7.mongodb.net/?retryWrites=true&w=majority&appName=sistema-triage"
 
 
@@ -87,14 +87,6 @@ def crear_calificacion(request):
                         print(f"✅ Guardado en MongoDB Atlas con ID: {resultado.inserted_id}")
                         print(f"🕐 Hora UTC: {fecha_utc}")
                         print(f"🕐 Hora Colombia: {fecha_colombia}")
-                        
-                        documento = {
-                            'nombre': nombre,
-                            'comentario': comentario,
-                            'calificacion': calificacion_val,
-                            'fecha_creacion': timezone.now()
-                        }
-                        
                         
                         client.close()
                         
@@ -276,7 +268,7 @@ def detalle_calificacion(request, id):
     return redirect('calificaciones:lista_calificaciones')
 
 
-# VISTAS GENÉRICAS
+# VISTAS GENÉRICAS (CBV)
 
 
 class CalificacionListView(ListView):
@@ -474,4 +466,3 @@ def estadisticas_calificaciones(request):
     }
     
     return render(request, 'calificaciones/estadisticas.html', context)
-    
